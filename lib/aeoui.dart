@@ -25,6 +25,8 @@ import 'organiserPageNotifications.dart';
 import 'widgets/customshape.dart';
 
 class AeoUI extends StatefulWidget {
+  final String username;
+  AeoUI({this.username});
   @override
   _AeoUIState createState() => _AeoUIState();
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -8,6 +10,7 @@ import 'package:rooms/forgetPassword.dart';
 import 'package:rooms/newDontHaveaAccount.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'aeoui.dart';
+import 'package:http/http.dart'as http;
 String email;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -142,7 +145,7 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
                 loggingin=true;
               });
               signInWithGoogle().whenComplete(() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-              return AeoUI();
+              return AeoUI(username: email.toString(),);
             })));
             },
             AssetImage(
@@ -202,17 +205,24 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
         break;
       case FacebookLoginStatus.loggedIn:
         print("LoggedIn");
-        onLoginStatusChanged(true);
+        var graphResponse = await http.get(
+            'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${facebookLoginResult
+                .accessToken.token}');
+
+        var profile = json.decode(graphResponse.body);
+        print(profile.toString());
+
+        onLoginStatusChanged(true, profileData: profile);
         break;
     }
   }
 
 
-  void onLoginStatusChanged(bool isLoggedIn) {
+  void onLoginStatusChanged(bool isLoggedIn,{Map<String,dynamic> profileData}) {
     setState(() {
       if(isLoggedIn){
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-          return AeoUI();
+          return AeoUI(username: profileData['name'],);
         }));
       }
       loggingin=false;
