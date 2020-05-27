@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "140743109004",
+    "firebase_url": "https://osho-b6c37.firebaseio.com",
+    "project_id": "osho-b6c37",
+    "storage_bucket": "osho-b6c37.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140743109004:android:6bda2beb830f01c5c3cea9",
+        "android_client_info": {
+          "package_name": "com.example.oshoaashrams"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140743109004-fh0nq64in0plpo4j8guotgdvihk9d4ht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.oshoaashrams",
+            "certificate_hash": "48c14a2a0a7678692006bcf715bfdf2b5a3ef3bd"
+          }
+        },
+        {
+          "client_id": "140743109004-ke7n1vhn904t6s7ricvp5bf2omkmu67i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYyJga1N4I3LvFABlysP60jkN3ckcReZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140743109004-ke7n1vhn904t6s7ricvp5bf2omkmu67i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
