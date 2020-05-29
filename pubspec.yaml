@@ -40,6 +40,10 @@ dependencies:
   cloud_firestore:
   firebase_core:
   cloud_functions:
+  image_cropper:
+  image_picker:
+  toggle_switch:
+  firebase_storage:
   http:
   flutter:
     sdk: flutter
