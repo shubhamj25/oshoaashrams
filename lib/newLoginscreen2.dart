@@ -6,45 +6,14 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:rooms/constant/constant.dart';
 import 'package:rooms/forgetPassword.dart';
 import 'package:rooms/newDontHaveaAccount.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:rooms/userProfilePafe.dart';
 import 'aeoui.dart';
 import 'package:http/http.dart'as http;
-String email;
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-final GoogleSignIn googleSignIn = GoogleSignIn();
-
-Future<String> signInWithGoogle() async {
-  final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-  final GoogleSignInAuthentication googleSignInAuthentication =
-  await googleSignInAccount.authentication;
-
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleSignInAuthentication.accessToken,
-    idToken: googleSignInAuthentication.idToken,
-  );
-
-  final AuthResult authResult = await _auth.signInWithCredential(credential);
-  final FirebaseUser user = authResult.user;
-
-  assert(!user.isAnonymous);
-  assert(await user.getIdToken() != null);
-
-  final FirebaseUser currentUser = await _auth.currentUser();
-  assert(user.uid == currentUser.uid);
-
-  assert(user.email != null);
-  email = user.email;
-
-  return 'signInWithGoogle succeeded: $user';
-}
-
-void signOutGoogle() async{
-  await googleSignIn.signOut();
-  print("User Sign Out");
-}
 
 class NewLoginScreenTwo extends StatefulWidget {
   String message;
@@ -54,6 +23,11 @@ class NewLoginScreenTwo extends StatefulWidget {
 }
 
 class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
+
+
+
+
+bool userexists=false;
   @override
   void initState() {
     super.initState();
@@ -66,16 +40,16 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
-      createUser(deepLink.queryParameters['email'],deepLink.queryParameters['password']);
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
     }
 
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
-            createUser(deepLink.queryParameters['email'],deepLink.queryParameters['password']);
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
           }
         }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
@@ -83,13 +57,16 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
     });
   }
 
-  void createUser(String email,String password) async{
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser user;
-    user=(await auth.createUserWithEmailAndPassword(email: email, password:password)) as FirebaseUser;
+  void createUser(String name,String mobile,String email,String password,String gender) async{
+   // final FirebaseAuth auth = FirebaseAuth.instance;
+    //FirebaseUser user;
+    //user=(await auth.createUserWithEmailAndPassword(email: email, password:password)).user;
     Firestore.instance.collection("users").document(email.toString()).setData({
-      "email":user.email,
-      "uid":user.uid
+      "name":name,
+      "mobile":mobile,
+      "email":email,
+      "gender":gender,
+      "password":password,
     });
   }
 
@@ -121,7 +98,6 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
       ),
     );
   }
-
   Widget _buildSocialBtnRow() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15.0),
@@ -129,7 +105,7 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           _buildSocialBtn(
-            (){
+            () async {
               setState(() {
                 loggingin=true;
               });
@@ -140,13 +116,13 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
             ),
           ),
           _buildSocialBtn(
-            () {
+            () async {
               setState(() {
                 loggingin=true;
               });
-              signInWithGoogle().whenComplete(() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
-              return AeoUI(username: email.toString(),);
-            })));
+              signInWithGoogle().whenComplete(() => Navigator.pushReplacement(context,MaterialPageRoute(builder: (context){
+                return AeoUI(username: email,);
+              }) ));
             },
             AssetImage(
               'assets/images/google.jpg',
@@ -189,9 +165,7 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
   }
  bool hidepass=false;
 
-
   void initiateFacebookLogin() async {
-    var facebookLogin = FacebookLogin();
     var facebookLoginResult =
     await facebookLogin.logIn(['email']);
     switch (facebookLoginResult.status) {
@@ -207,7 +181,7 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
         print("LoggedIn");
         var graphResponse = await http.get(
             'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${facebookLoginResult
-                .accessToken.token}');
+                .accessToken.token}&picture?width=500,height=500');
 
         var profile = json.decode(graphResponse.body);
         print(profile.toString());
@@ -217,13 +191,36 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
     }
   }
 
-
   void onLoginStatusChanged(bool isLoggedIn,{Map<String,dynamic> profileData}) {
     setState(() {
       if(isLoggedIn){
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-          return AeoUI(username: profileData['name'],);
-        }));
+        Firestore.instance.collection("users").document("${profileData['email']}").get().then((doc){
+          if(doc.exists){
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+              return AeoUI(username: profileData['email'],);
+            }));
+          }
+          else{
+            Firestore.instance.collection("users").document("${profileData['email']}").setData({
+              "uid":profileData['access_token'],
+              "name":profileData['name'],
+              "email":profileData['email'],
+              "photoURL":profileData['picture'],
+              "password":"oshoaashrams"
+            },merge: true);
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+              return AeoUI(username: profileData['email'],);
+            }));
+         /*   _scaffoldKey.currentState.showSnackBar(SnackBar(content: Row(
+              children: <Widget>[
+                Icon(Icons.warning),
+                Text("SignUp First Please",style: TextStyle(color: Colors.white),),
+              ],
+            ),backgroundColor: Colors.red,));
+
+          */
+          }
+        });
       }
       loggingin=false;
     });
@@ -377,44 +374,43 @@ class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
                           width: double.infinity,
                           child: RaisedButton(
                             elevation: 5.0,
-                            onPressed: () async {
+                            onPressed: () {
                               setState(() {
                                 loggingin=true;
                               });
-                              try {
-                                final FirebaseAuth auth = FirebaseAuth
-                                    .instance;
-                                await auth
-                                    .signInWithEmailAndPassword(
-                                    email: _emailController.text
-                                        .trim(),
-                                    password: _passwordController.text
-                                        .trim()).then((user){
-                                  if(user!=null){
-                                    setState(() {
-                                      Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
-                                        return AeoUI();
-                                      }));
-                                      loggingin=false;
-                                    });
+                              Firestore.instance.collection("users").document("${_emailController.text.trim()}").get().then((doc){
+                                if(doc.exists){
+                                  if(_passwordController.text.trim()==doc.data['password']){
+                                    Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
+                                      return AeoUI(username: _emailController.text.trim(),);
+                                    }));
+                                  }else{
+                                    _scaffoldKey.currentState.showSnackBar(SnackBar(backgroundColor: Colors.red,content: Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.close,color:Colors.white),
+                                        ),
+                                        Text("Invalid Credentials"),
+                                      ],
+                                    ),));
                                   }
-                                });
-                              } catch (e) {
-                                setState(() {
+                                }
+                                else{
                                   _scaffoldKey.currentState.showSnackBar(SnackBar(backgroundColor: Colors.red,content: Row(
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.all(5.0),
-                                        child: Icon(Icons.close,color:Colors.white),
+                                        child: Icon(Icons.error,color:Colors.white),
                                       ),
-                                      Text("Invalid Credentials"),
+                                      Text("SignUp First Please"),
                                     ],
                                   ),));
-                                });
+                                }
                                 setState(() {
                                   loggingin=false;
                                 });
-                              }
+                              });
                             },
                             padding: EdgeInsets.all(15.0),
                             shape: RoundedRectangleBorder(
@@ -502,4 +498,59 @@ final kBoxDecorationStyle = BoxDecoration(
 
 
 
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final GoogleSignIn googleSignIn = GoogleSignIn();
+var facebookLogin = FacebookLogin();
+Future<String> signInWithGoogle() async {
+  final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+  final GoogleSignInAuthentication googleSignInAuthentication =
+  await googleSignInAccount.authentication;
 
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleSignInAuthentication.accessToken,
+    idToken: googleSignInAuthentication.idToken,
+  );
+
+  final AuthResult authResult = await _auth.signInWithCredential(credential);
+  final FirebaseUser user = authResult.user;
+
+  assert(!user.isAnonymous);
+  assert(await user.getIdToken() != null);
+
+  final FirebaseUser currentUser = await _auth.currentUser();
+  assert(user.uid == currentUser.uid);
+
+  updateUserData(user);
+
+  return 'signInWithGoogle succeeded: $user';
+}
+
+void signOutGoogle() async{
+  await googleSignIn.signOut();
+
+  print("User Sign Out");
+}
+
+String email;
+void updateUserData(FirebaseUser user) async {
+  email=user.email;
+  Firestore.instance.collection("users").document(user.email).get().then((value){
+    if(!value.exists){
+      DocumentReference ref = Firestore.instance.collection('users').document(user.email);
+      return ref.setData({
+        'uid': user.uid,
+        'email': user.email,
+        'phone':user.phoneNumber,
+        'photoURL': user.photoUrl,
+        'name': user.displayName,
+        'lastSeen': DateTime.now(),
+        "password":"oshoaashrams"
+      }, merge: true);
+    }
+    else
+      {
+        return null;
+      }
+  });
+
+}

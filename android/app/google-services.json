@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "140743109004-fh0nq64in0plpo4j8guotgdvihk9d4ht.apps.googleusercontent.com",
+          "client_id": "140743109004-gpdplg9vocefbulfrfmjos7uusgt99mh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.oshoaashrams",
-            "certificate_hash": "48c14a2a0a7678692006bcf715bfdf2b5a3ef3bd"
+            "certificate_hash": "7ebf4dc4e835facbd75f679734df7974cacfc676"
           }
         },
         {

@@ -5,8 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/bottomNavigationPage3.dart';
 import 'package:rooms/newLoginscreen2.dart';
 import 'package:rooms/subscriptioncallingpage.dart';
-import 'package:rooms/userProfilecalling.dart';
-
+import 'package:rooms/userProfilePafe.dart';
 import 'OnGoingEvents.dart';
 import 'bottomnavigationpage2.dart';
 import 'constant/constant.dart';
@@ -159,7 +158,7 @@ class _AeoUIState extends State<AeoUI> {
                 " Dashboard ",
                 () => {
                       Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) => AeoUI()))
+                          builder: (BuildContext context) => UserProfileUI(widget.username)))
                     }),
             CustomListview(
                 Icons.contact_mail,
@@ -197,8 +196,8 @@ class _AeoUIState extends State<AeoUI> {
                 Icons.offline_bolt,
                 "LogOut",
                 () {
-                  if(email!=null){signOutGoogle();}
-                      Navigator.of(context).push(new MaterialPageRoute(
+                  signOutGoogle();facebookLogin.logOut();
+                  Navigator.of(context).push(new MaterialPageRoute(
                           builder: (BuildContext context) =>
                               NewLoginScreenTwo()));
                     })
@@ -786,7 +785,7 @@ class _AeoUIState extends State<AeoUI> {
                   builder: (BuildContext context) => SavedPage()));
             if (index == 4)
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => Usercalling()));
+                  builder: (BuildContext context) => UserProfileUI(widget.username)));
 //    Navigator.of(context).push(MaterialPageRoute(
 //    builder: (BuildContext context) => SavedPage()));
           }),
