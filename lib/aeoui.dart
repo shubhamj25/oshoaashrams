@@ -23,64 +23,20 @@ import 'model/yourwalletslist.dart';
 import 'organiserPageNotifications.dart';
 import 'widgets/customshape.dart';
 
-class AeoUI extends StatefulWidget {
+String loggedInEmail;
+class HomePage extends StatefulWidget {
   final String username;
-  AeoUI({this.username});
+  HomePage({this.username});
   @override
-  _AeoUIState createState() => _AeoUIState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _AeoUIState extends State<AeoUI> {
+class _HomePageState extends State<HomePage> {
   String msg = 'Hey Friends try this OSHO app';
   String base64Image = '';
-  TextEditingController customController = new TextEditingController();
-  String drpdwmstr = "Events";
-  Future<String> createUserEventReview(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Review the Event"),
-            content: TextField(
-              controller: customController,
-            ),
-            actions: [
-              DropdownButton<String>(
-                value: drpdwmstr,
-                onChanged: (String newValue) {
-                  setState(() {
-                    drpdwmstr = newValue;
-                  });
-                },
-                items: <String>[
-                  'Events',
-                  'Event 1',
-                  "Event 2",
-                  "Event 3",
-                  "Event 4"
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              MaterialButton(
-                child: Text("Submit"),
-                textColor: Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop(customController.text.toString());
-                },
-                elevation: 5.0,
-              )
-            ],
-          );
-        });
-  }
 
   double _width;
   double _height;
-
   List<AreaLocationList> areaLocationList;
   List<ReadyForSummerList> readyForSummer;
   List<LimitedPeriodOfferList> limitedPeriodOffer;
@@ -90,707 +46,6 @@ class _AeoUIState extends State<AeoUI> {
   List<OyoSpecialsList> oyoSpecials;
   List<LatestOyoList> latestOyo;
   List<YourWalletList> yourWallets;
-
-  @override
-  void initState() {
-    super.initState();
-    areaLocationList = Constants.getLocationList();
-    readyForSummer = Constants.getSummerList();
-    limitedPeriodOffer = Constants.getLimitedPeriodOfferList();
-    exploreOyoHotels = Constants.getExploreOyoHotelsList();
-    weekendGetaways = Constants.getWeekendsList();
-    oyoSpecials = Constants.getOyoSpecials();
-    latestOyo = Constants.getLatestOyo();
-    yourWallets = Constants.getYourWallet();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _height = MediaQuery.of(context).size.height;
-    _width = MediaQuery.of(context).size.width;
-    int _currentIndex = 0;
-//    final _pageoptions=[AeoUI(),SavedPage(),BottomNaviationProfile()]
-    Widget image_carousel;
-    return Scaffold(
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    Material(
-                      borderRadius: BorderRadius.all(Radius.circular(70)),
-                      elevation: 10,
-                      child: Image.asset(
-                        'assets/images/drawerimage.png',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                      child: Text(
-                        "OSHO",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17.0),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: <Color>[
-                Colors.red,
-                Colors.redAccent,
-                Colors.red.shade400
-              ])),
-            ),
-            CustomListview(
-                Icons.person,
-                " Dashboard ",
-                () => {
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) => UserProfileUI(widget.username)))
-                    }),
-            CustomListview(
-                Icons.contact_mail,
-                "Event Registration",
-                () => {
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) => EventOrganiser()))
-                    }),
-            CustomListview(
-                Icons.rate_review,
-                "Review an event",
-                () => {
-                      createUserEventReview(context).then((value) {
-                        SnackBar mySnackbar =
-                            new SnackBar(content: Text("Review Saved !"));
-                        Scaffold.of(context).showSnackBar(mySnackbar);
-                      })
-                    }),
-            CustomListview(
-                Icons.account_balance_wallet,
-                "Wallet",
-                () => {
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) => WalletApp()))
-                    }),
-            CustomListview(
-                Icons.subscriptions,
-                "Subscriptions",
-                () => {
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              SubscriptionMyApp()))
-                    }),
-            CustomListview(
-                Icons.offline_bolt,
-                "LogOut",
-                () {
-                  signOutGoogle();facebookLogin.logOut();
-                  Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              NewLoginScreenTwo()));
-                    })
-          ],
-        ),
-      ),
-      backgroundColor: Colors.grey[100],
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              expandedHeight: _height / 5,
-              floating: true,
-
-              actions: <Widget>[
-                Container(
-                    margin: EdgeInsets.only(right: 15),
-                    child: IconButton(
-                      icon: Icon(Icons.notifications_active),
-                      onPressed: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                OrganiserNotifications()));
-                      }, //notification Page of the consumer
-                    ))
-              ],
-              backgroundColor: Color.fromRGBO(253, 11, 23, 1),
-              //#f02730
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                centerTitle: true,
-                titlePadding: EdgeInsets.only(top: 25.0),
-                title: Center(
-                  child: Image.asset(
-                    'assets/images/OshoLogo.png',
-                    height: 70.0,
-                    width: 70.0,
-                  ),
-                ),
-              ),
-              bottom: PreferredSize(
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
-                    ),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    width: _width,
-                    height: _height / 18,
-                    alignment: Alignment.topCenter,
-                    child: TextFormField(
-                      cursorColor: Colors.grey,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(2),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            size: 30,
-                            color: Colors.grey,
-                          ),
-                          hintText: "Search for Aashram, City or Location",
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 13.0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none)),
-                    ),
-                  ),
-                  preferredSize: Size(_width, _height / 20)),
-            ),
-          ];
-        },
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: _height / 6,
-                child: ListView.builder(
-                    itemCount: areaLocationList.length,
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _buildLocationList(areaLocationList[index]);
-                    }),
-              ),
-              image_carousel = new Container(
-                height: 300.0,
-                child: Carousel(
-                  boxFit: BoxFit.cover,
-                  images: [
-                    AssetImage("assets/images/c1.jpg"),
-                    AssetImage("assets/images/c2.jpg"),
-                    AssetImage("assets/images/c3.jpg"),
-                    AssetImage("assets/images/c4.jpg"),
-                    AssetImage("assets/images/c5.jpg"),
-                  ],
-                  autoplay: true,
-                  animationCurve: Curves.fastOutSlowIn,
-                  animationDuration: Duration(milliseconds: 1000),
-                  dotSize: 4.0,
-                  indicatorBgPadding: 6.0,
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => OnGoingEvents()));
-                },
-                child: Padding(
-                  padding: EdgeInsets.only(top: 20, left: 10, right: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Best Aashrams ॐ ',
-                          style: GoogleFonts.balooBhaina(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w400,
-                            fontStyle: FontStyle.normal,
-                          )),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  BookingPage()));
-                        },
-                        child: Container(
-                          //color: Colors.blue,
-                          margin: EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 3,
-                              spreadRadius: 0.2,
-                              offset: Offset(0.1, 3),
-                            ),
-                          ]),
-                          height: _height / 8,
-                          width: _width,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: Image.asset(
-                              'assets/images/53.PNG',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  BookingPage()));
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 20),
-                          child: Text(
-                            'OSHO SPIRITUALITY  !',
-                            style: GoogleFonts.balooBhaina(
-                                fontWeight: FontWeight.w600, fontSize: 15),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  BookingPage()));
-                        },
-                        child: Container(
-                          //color: Colors.blue,
-                          margin: EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 3,
-                              spreadRadius: 0.2,
-                              offset: Offset(0.1, 3),
-                            ),
-                          ]),
-                          height: _height / 4,
-                          width: _width,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: Image.asset(
-                              'assets/images/Capture.PNG',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          FlutterShareMe().shareToWhatsApp(
-                              base64Image: base64Image, msg: msg);
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 20),
-                          child: Text(
-                            'Referred win',
-                            style: GoogleFonts.balooBhaina(
-                                fontWeight: FontWeight.w600, fontSize: 15),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          FlutterShareMe().shareToWhatsApp(
-                              base64Image: base64Image, msg: msg);
-                        },
-                        child: Container(
-                          //color: Colors.blue,
-                          margin: EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 3,
-                              spreadRadius: 0.2,
-                              offset: Offset(0.1, 3),
-                            ),
-                          ]),
-                          height: 90,
-                          width: MediaQuery.of(context).size.width,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: Image.asset(
-                              'assets/images/referwin.jpg',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  SubscriptionMyApp()));
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 20),
-                          child: Text(
-                            'Exclusive Deals',
-                            style: GoogleFonts.balooBhaina(
-                                fontWeight: FontWeight.w600, fontSize: 15),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  SubscriptionMyApp()));
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 10),
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 3,
-                              spreadRadius: 0.2,
-                              offset: Offset(0.1, 3),
-                            ),
-                          ]),
-                          height: _height / 4.5,
-                          width: _width,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: Image.asset(
-                              'assets/images/dailySale.jpg',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Get Ready for Summer !',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        height: 90,
-                        //height: MediaQuery.of(context).size.height,
-                        width: _width,
-                        child: ListView.builder(
-                            itemCount: readyForSummer.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildSummerList(readyForSummer[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Meditation And YOGA',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        height: _height / 4,
-                        child: ListView.builder(
-                            itemCount: limitedPeriodOffer.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildLimitedPeriodList(
-                                  limitedPeriodOffer[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Connect With Nature',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        //color: Colors.blue,
-                        margin: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 3,
-                            spreadRadius: 0.2,
-                            offset: Offset(0.1, 3),
-                          ),
-                        ]),
-                        height: _height / 3.7,
-                        width: _width,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.asset(
-                            'assets/images/fun.jpeg',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Explore OSHO Aashrams',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        width: _width,
-                        height: _height / 2.3,
-                        child: ListView.builder(
-                            itemCount: exploreOyoHotels.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildExploreAeoHotelsList(
-                                  exploreOyoHotels[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Weekend Getaways',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        width: MediaQuery.of(context).size.width,
-                        height: _height / 2.8,
-                        child: ListView.builder(
-                            itemCount: weekendGetaways.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildWeekendGetawaysList(
-                                  weekendGetaways[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Osho Specials',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        width: _width,
-                        height: _height / 2.4,
-                        child: ListView.builder(
-                            itemCount: oyoSpecials.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildAeoSpecialsList(oyoSpecials[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Latest at OSHO',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        width: _width,
-                        height: _height / 2.4,
-                        child: ListView.builder(
-                            itemCount: latestOyo.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildLatestAeoList(latestOyo[index]);
-                            }),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        child: Text(
-                          'Shake & Win',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        height: _height / 4.2,
-                        width: _width,
-                        child: Card(
-                          elevation: 2,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(5),
-                                topRight: Radius.circular(5),
-                                bottomLeft: Radius.circular(5),
-                                bottomRight: Radius.circular(5)),
-                            child: Image.asset(
-                              'assets/images/shake_win.jpg',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                          //color: Colors.orange,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Play and win',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        height: _height / 4.5,
-                        width: _width,
-                        child: Card(
-                          elevation: 2,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(5),
-                                topRight: Radius.circular(5),
-                                bottomLeft: Radius.circular(5),
-                                bottomRight: Radius.circular(5)),
-                            child: Image.asset(
-                              'assets/images/playwin.jpg',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                          //color: Colors.orange,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Your wallets',
-                          style: GoogleFonts.balooBhaina(
-                              fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        width: _width,
-                        height: _height / 4.2,
-                        child: ListView.builder(
-                            itemCount: yourWallets.length,
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              return _buildYourWalletsList(yourWallets[index]);
-                            }),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home,
-                  color: Color.fromARGB(255, 196, 26, 61),
-                ),
-                title: Text(
-                  "Home",
-                  style: GoogleFonts.balooBhaina(
-                    color: Color.fromARGB(255, 196, 26, 61),
-                  ),
-                )),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.event,
-                  color: Color.fromARGB(255, 196, 26, 61),
-                ),
-                title: Text(
-                  "On Going Events",
-                  style: GoogleFonts.balooBhaina(
-                    color: Color.fromARGB(255, 196, 26, 61),
-                  ),
-                )),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.history,
-                  color: Color.fromARGB(255, 196, 26, 61),
-                ),
-                title: Text(
-                  "Add Events",
-                  style: GoogleFonts.balooBhaina(
-                    color: Color.fromARGB(255, 196, 26, 61),
-                  ),
-                )),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.favorite_border,
-                  color: Color.fromARGB(255, 196, 26, 61),
-                ),
-                title: Text("Saved",
-                    style: GoogleFonts.balooBhaina(
-                      color: Color.fromARGB(255, 196, 26, 61),
-                    ))),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
-                  color: Color.fromARGB(255, 196, 26, 61),
-                ),
-                title: Text("Profile",
-                    style: GoogleFonts.balooBhaina(
-                      color: Color.fromARGB(255, 196, 26, 61),
-                    ))),
-          ],
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-            debugPrint("the current page is $_currentIndex");
-            if (index == 0)
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => AeoUI()));
-            if (index == 1)
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => OnGoingEvents()));
-            if (index == 2)
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => BookingPage()));
-            if (index == 3)
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => SavedPage()));
-            if (index == 4)
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => UserProfileUI(widget.username)));
-//    Navigator.of(context).push(MaterialPageRoute(
-//    builder: (BuildContext context) => SavedPage()));
-          }),
-    );
-  }
 
   Widget _buildLocationList(AreaLocationList item) {
     return Container(
@@ -1014,7 +269,7 @@ class _AeoUIState extends State<AeoUI> {
                     Text(
                       item.title,
                       style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                     SizedBox(
                       height: 10,
@@ -1147,8 +402,772 @@ class _AeoUIState extends State<AeoUI> {
       ),
     );
   }
+
+@override
+  void initState() {
+    super.initState();
+    areaLocationList = Constants.getLocationList();
+    readyForSummer = Constants.getSummerList();
+    limitedPeriodOffer = Constants.getLimitedPeriodOfferList();
+    exploreOyoHotels = Constants.getExploreOyoHotelsList();
+    weekendGetaways = Constants.getWeekendsList();
+    oyoSpecials = Constants.getOyoSpecials();
+    latestOyo = Constants.getLatestOyo();
+    yourWallets = Constants.getYourWallet();
+  }
+  Widget image_carousel;
+  @override
+  Widget build(BuildContext context) {
+    _height = MediaQuery.of(context).size.height;
+    _width = MediaQuery.of(context).size.width;
+    return NestedScrollView(
+      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        return <Widget>[
+          SliverAppBar(
+            expandedHeight: _height / 5,
+            floating: true,
+
+            actions: <Widget>[
+              Container(
+                  margin: EdgeInsets.only(right: 15),
+                  child: IconButton(
+                    icon: Icon(Icons.notifications_active),
+                    onPressed: () {
+                      Navigator.of(context).push(new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              OrganiserNotifications()));
+                    }, //notification Page of the consumer
+                  ))
+            ],
+            backgroundColor: Color.fromRGBO(253, 11, 23, 1),
+            //#f02730
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              centerTitle: true,
+              titlePadding: EdgeInsets.only(top: 25.0),
+              title: Center(
+                child: Image.asset(
+                  'assets/images/OshoLogo.png',
+                  height: 70.0,
+                  width: 70.0,
+                ),
+              ),
+            ),
+            bottom: PreferredSize(
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                  ),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10)),
+                  width: _width,
+                  height: _height / 18,
+                  alignment: Alignment.topCenter,
+                  child: TextFormField(
+                    cursorColor: Colors.grey,
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(2),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          size: 30,
+                          color: Colors.grey,
+                        ),
+                        hintText: "Search for Aashram, City or Location",
+                        hintStyle: TextStyle(
+                            fontWeight: FontWeight.w300, fontSize: 13.0),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none)),
+                  ),
+                ),
+                preferredSize: Size(_width, _height / 20)),
+          ),
+        ];
+      },
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: _height / 6,
+              child: ListView.builder(
+                  itemCount: areaLocationList.length,
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildLocationList(areaLocationList[index]);
+                  }),
+            ),
+            image_carousel = new Container(
+              height: 300.0,
+              child: Carousel(
+                boxFit: BoxFit.cover,
+                images: [
+                  AssetImage("assets/images/c1.jpg"),
+                  AssetImage("assets/images/c2.jpg"),
+                  AssetImage("assets/images/c3.jpg"),
+                  AssetImage("assets/images/c4.jpg"),
+                  AssetImage("assets/images/c5.jpg"),
+                ],
+                autoplay: true,
+                animationCurve: Curves.fastOutSlowIn,
+                animationDuration: Duration(milliseconds: 1000),
+                dotSize: 4.0,
+                indicatorBgPadding: 6.0,
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => OnGoingEvents()));
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 20, left: 10, right: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('Best Aashrams ॐ ',
+                        style: GoogleFonts.balooBhaina(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                        )),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                BookingPage()));
+                      },
+                      child: Container(
+                        //color: Colors.blue,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 3,
+                            spreadRadius: 0.2,
+                            offset: Offset(0.1, 3),
+                          ),
+                        ]),
+                        height: _height / 8,
+                        width: _width,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            'assets/images/53.PNG',
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                BookingPage()));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 20),
+                        child: Text(
+                          'OSHO SPIRITUALITY  !',
+                          style: GoogleFonts.balooBhaina(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                BookingPage()));
+                      },
+                      child: Container(
+                        //color: Colors.blue,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 3,
+                            spreadRadius: 0.2,
+                            offset: Offset(0.1, 3),
+                          ),
+                        ]),
+                        height: _height / 4,
+                        width: _width,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            'assets/images/Capture.PNG',
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        FlutterShareMe().shareToWhatsApp(
+                            base64Image: base64Image, msg: msg);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 20),
+                        child: Text(
+                          'Referred win',
+                          style: GoogleFonts.balooBhaina(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        FlutterShareMe().shareToWhatsApp(
+                            base64Image: base64Image, msg: msg);
+                      },
+                      child: Container(
+                        //color: Colors.blue,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 3,
+                            spreadRadius: 0.2,
+                            offset: Offset(0.1, 3),
+                          ),
+                        ]),
+                        height: 90,
+                        width: MediaQuery.of(context).size.width,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            'assets/images/referwin.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                SubscriptionMyApp()));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 20),
+                        child: Text(
+                          'Exclusive Deals',
+                          style: GoogleFonts.balooBhaina(
+                              fontWeight: FontWeight.w600, fontSize: 15),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                SubscriptionMyApp()));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 3,
+                            spreadRadius: 0.2,
+                            offset: Offset(0.1, 3),
+                          ),
+                        ]),
+                        height: _height / 4.5,
+                        width: _width,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            'assets/images/dailySale.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Get Ready for Summer !',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      height: 90,
+                      //height: MediaQuery.of(context).size.height,
+                      width: _width,
+                      child: ListView.builder(
+                          itemCount: readyForSummer.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildSummerList(readyForSummer[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Meditation And YOGA',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      height: _height / 4,
+                      child: ListView.builder(
+                          itemCount: limitedPeriodOffer.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildLimitedPeriodList(
+                                limitedPeriodOffer[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Connect With Nature',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      //color: Colors.blue,
+                      margin: EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 3,
+                          spreadRadius: 0.2,
+                          offset: Offset(0.1, 3),
+                        ),
+                      ]),
+                      height: _height / 3.7,
+                      width: _width,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.asset(
+                          'assets/images/fun.jpeg',
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Explore OSHO Aashrams',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      width: _width,
+                      height: _height / 2.3,
+                      child: ListView.builder(
+                          itemCount: exploreOyoHotels.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildExploreAeoHotelsList(
+                                exploreOyoHotels[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Weekend Getaways',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      width: MediaQuery.of(context).size.width,
+                      height: _height / 2.8,
+                      child: ListView.builder(
+                          itemCount: weekendGetaways.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildWeekendGetawaysList(
+                                weekendGetaways[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Osho Specials',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      width: _width,
+                      height: _height / 2.4,
+                      child: ListView.builder(
+                          itemCount: oyoSpecials.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildAeoSpecialsList(oyoSpecials[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Latest at OSHO',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      width: _width,
+                      height: _height / 2.4,
+                      child: ListView.builder(
+                          itemCount: latestOyo.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildLatestAeoList(latestOyo[index]);
+                          }),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Shake & Win',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      height: _height / 4.2,
+                      width: _width,
+                      child: Card(
+                        elevation: 2,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              topRight: Radius.circular(5),
+                              bottomLeft: Radius.circular(5),
+                              bottomRight: Radius.circular(5)),
+                          child: Image.asset(
+                            'assets/images/shake_win.jpg',
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        //color: Colors.orange,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Play and win',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      height: _height / 4.5,
+                      width: _width,
+                      child: Card(
+                        elevation: 2,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              topRight: Radius.circular(5),
+                              bottomLeft: Radius.circular(5),
+                              bottomRight: Radius.circular(5)),
+                          child: Image.asset(
+                            'assets/images/playwin.jpg',
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        //color: Colors.orange,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Your wallets',
+                        style: GoogleFonts.balooBhaina(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      width: _width,
+                      height: _height / 4.2,
+                      child: ListView.builder(
+                          itemCount: yourWallets.length,
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _buildYourWalletsList(yourWallets[index]);
+                          }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
+
+
+class AeoUI extends StatefulWidget {
+  final String username;
+  final int currentState;
+  AeoUI({this.username,this.currentState});
+  @override
+  _AeoUIState createState() => _AeoUIState();
+}
+
+class _AeoUIState extends State<AeoUI> {
+  String drpdwmstr = "Events";
+  int _currentIndex = 0;
+  TextEditingController customController = new TextEditingController();
+  Future<String> createUserEventReview(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Review the Event"),
+            content: TextField(
+              controller: customController,
+            ),
+            actions: [
+              DropdownButton<String>(
+                value: drpdwmstr,
+                onChanged: (String newValue) {
+                  setState(() {
+                    drpdwmstr = newValue;
+                  });
+                },
+                items: <String>[
+                  'Events',
+                  'Event 1',
+                  "Event 2",
+                  "Event 3",
+                  "Event 4"
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              MaterialButton(
+                child: Text("Submit"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(customController.text.toString());
+                },
+                elevation: 5.0,
+              )
+            ],
+          );
+        });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(widget.currentState!=null){
+      setState(() {
+        _currentIndex=widget.currentState;
+      });
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(),SavedPage(email: widget.username,),UserProfileUI(widget.username)];
+    return SafeArea(
+      child: Scaffold(
+        drawer: Drawer(
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Material(
+                        borderRadius: BorderRadius.all(Radius.circular(70)),
+                        elevation: 10,
+                        child: Image.asset(
+                          'assets/images/drawerimage.png',
+                          width: 100,
+                          height: 100,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                        child: Text(
+                          "OSHO",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 17.0),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: <Color>[
+                      Colors.red,
+                      Colors.redAccent,
+                      Colors.red.shade400
+                    ])),
+              ),
+              CustomListview(
+                  Icons.person,
+                  " Dashboard ",
+                      () =>
+                  {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            UserProfileUI(widget.username)))
+                  }),
+              CustomListview(
+                  Icons.contact_mail,
+                  "Event Registration",
+                      () =>
+                  {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) => EventOrganiser()))
+                  }),
+              CustomListview(
+                  Icons.rate_review,
+                  "Review an event",
+                      () =>
+                  {
+                    createUserEventReview(context).then((value) {
+                      SnackBar mySnackbar =
+                      new SnackBar(content: Text("Review Saved !"));
+                      Scaffold.of(context).showSnackBar(mySnackbar);
+                    })
+                  }),
+              CustomListview(
+                  Icons.account_balance_wallet,
+                  "Wallet",
+                      () =>
+                  {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) => WalletApp()))
+                  }),
+              CustomListview(
+                  Icons.subscriptions,
+                  "Subscriptions",
+                      () =>
+                  {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            SubscriptionMyApp()))
+                  }),
+              CustomListview(
+                  Icons.offline_bolt,
+                  "LogOut",
+                      () {
+                    signOutGoogle();
+                    facebookLogin.logOut();
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            NewLoginScreenTwo()));
+                  })
+            ],
+          ),
+        ),
+        backgroundColor: Colors.grey[100],
+        body:_pageOptions[_currentIndex],
+        bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            items: [
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.home,
+                    color: Color.fromARGB(255, 196, 26, 61),
+                  ),
+                  title: Text(
+                    "Home",
+                    style: GoogleFonts.balooBhaina(
+                      color: Color.fromARGB(255, 196, 26, 61),
+                    ),
+                  )),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.event,
+                    color: Color.fromARGB(255, 196, 26, 61),
+                  ),
+                  title: Text(
+                    "Events",
+                    style: GoogleFonts.balooBhaina(
+                      color: Color.fromARGB(255, 196, 26, 61),
+                    ),
+                  )),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.history,
+                    color: Color.fromARGB(255, 196, 26, 61),
+                  ),
+                  title: Text(
+                    "Bookings",
+                    style: GoogleFonts.balooBhaina(
+                      color: Color.fromARGB(255, 196, 26, 61),
+                    ),
+                  )),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.favorite,
+                    color: Color.fromARGB(255, 196, 26, 61),
+                  ),
+                  title: Text("Saved",
+                      style: GoogleFonts.balooBhaina(
+                        color: Color.fromARGB(255, 196, 26, 61),
+                      ))),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.settings,
+                    color: Color.fromARGB(255, 196, 26, 61),
+                  ),
+                  title: Text("Profile",
+                      style: GoogleFonts.balooBhaina(
+                        color: Color.fromARGB(255, 196, 26, 61),
+                      ))),
+            ],
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+              debugPrint("the current page is $_currentIndex");
+            
+            }),
+      ),
+    );
+  }
+
+}
 class CustomListview extends StatelessWidget {
   IconData icon;
   String text;

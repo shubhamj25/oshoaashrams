@@ -38,6 +38,7 @@ dependencies:
   url_launcher:
   firebase_auth:
   cloud_firestore:
+  cached_network_image:
   firebase_core:
   cloud_functions:
   image_cropper:
@@ -175,6 +176,11 @@ flutter:
         fonts:
           - asset: fonts/Baloo_Tamma_2-Medium.ttf
             weight: 500
+
+      - family: Raleway
+        fonts:
+          - asset: fonts/Raleway-Regular.ttf
+          - asset: fonts/Raleway-SemiBold.ttf
 
   #   - family: Trajan Pro
   #     fonts:

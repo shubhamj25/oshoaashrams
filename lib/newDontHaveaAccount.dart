@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+
 import 'package:rooms/constant/constant.dart';
 import 'package:rooms/newLoginscreen2.dart';
-import 'package:rooms/userProfilePafe.dart';
-import 'package:rooms/userform.dart';
+
 
 String apiKey="Nzg1MDYjIyMyMDE4LTA2LTA2IDE2OjUzOjQ1";
 Map<String, dynamic> emailData = {
@@ -52,7 +51,7 @@ class _NewSinupState extends State<NewSinup> {
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
-      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
         return NewLoginScreenTwo(message: "SignUp Successful",);
       }));
@@ -62,7 +61,7 @@ class _NewSinupState extends State<NewSinup> {
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
-            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
               return NewLoginScreenTwo(message: "SignUp Successful",);
             }));
@@ -73,27 +72,27 @@ class _NewSinupState extends State<NewSinup> {
     });
   }
 
-  void createUser(String name,String mobile,String email,String password,String gender) async{
+  void createUser(String name,String phone,String email,String password,String gender) async{
     //final FirebaseAuth auth = FirebaseAuth.instance;
     //FirebaseUser user;
     //user=(await auth.createUserWithEmailAndPassword(email: email, password:password)).user;
     Firestore.instance.collection("users").document(email.toString()).setData({
       "name":name,
-      "mobile":mobile,
+      "phone":phone,
       "email":email,
       "gender":gender,
       "password":password,
     });
   }
 
-  Future<String> _createDynamicLink(bool short,String name,String mobile,String email,String password,String gender) async {
+  Future<String> _createDynamicLink(bool short,String name,String phone,String email,String password,String gender) async {
     setState(() {
       _isCreatingLink = true;
     });
 
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://oshoaashrams.page.link',
-      link: Uri.parse('https://oshoaashrams.page.link/post?name=$name&mobile=$mobile&email=$email&password=$password&gender=$gender'),
+      link: Uri.parse('https://oshoaashrams.page.link/post?name=$name&phone=$phone&email=$email&password=$password&gender=$gender'),
       androidParameters: AndroidParameters(
         packageName: 'com.example.oshoaashrams',
       ),

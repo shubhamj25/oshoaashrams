@@ -16,6 +16,7 @@ class ImageCapture extends StatefulWidget {
 class _ImageCaptureState extends State<ImageCapture> {
   File _imageFile;
   Future<void> _pickImage(ImageSource source) async {
+    // ignore: deprecated_member_use
     File selected=await ImagePicker.pickImage(source: source);
     setState(() {
       _imageFile=selected;
@@ -43,9 +44,9 @@ class _ImageCaptureState extends State<ImageCapture> {
   }
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        borderRadius: BorderRadius.all(Radius.circular(12.0)),
       ),
       child: Scaffold(
         bottomNavigationBar: BottomAppBar(
@@ -93,8 +94,6 @@ class _ImageCaptureState extends State<ImageCapture> {
                 child: Uploader(file:_imageFile,email: widget.email,),
               ),
             ],
-
-
 
             if(_imageFile==null)
               Stack(
@@ -166,18 +165,21 @@ class _UploaderState extends State<Uploader> {
                   child: Icon(Icons.pause),
                   onPressed: () => _task.isPaused,
                 ),
-              Center(
-                child: Text(
-                  "${(progressPercent * 100).toStringAsFixed(2)}%",
-                  style: TextStyle(
-                    color: Colors.lightBlueAccent,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Center(
+                  child: Text(
+                    "${(progressPercent * 100).toStringAsFixed(2)}%",
+                    style: TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: LinearProgressIndicator(
                   backgroundColor: Colors.white,
                   value: progressPercent,

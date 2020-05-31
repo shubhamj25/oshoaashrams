@@ -20,7 +20,10 @@ Future<void> main() async{
   runApp(MaterialApp(
     title: 'OSHO ',
     debugShowCheckedModeBanner: false,
-    theme: ThemeData(primarySwatch: Colors.blue),
+    theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Raleway',
+    ),
     routes: <String, WidgetBuilder>{
       Constants.SPLASH_SCREEN: (BuildContext context) =>
           AnimatedSplashScreen(),

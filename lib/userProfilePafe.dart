@@ -122,12 +122,7 @@ int retGender(AsyncSnapshot snapshot){
                                           builder: (context,setState){
                                             return Padding(
                                               padding: const EdgeInsets.all(20.0),
-                                              child: Card(
-                                                elevation: 12.0,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                                                ),
-                                                  child: ImageCapture(widget.email)),
+                                              child: ImageCapture(widget.email),
                                             );
                                           },
                                         );
@@ -139,11 +134,7 @@ int retGender(AsyncSnapshot snapshot){
                               )
                             ],
                           ),
-                          IconButton(icon: Icon(Icons.arrow_back,color: Colors.white,),
-                            onPressed: (){
-                              Navigator.pop(context);
-                            },
-                          )
+
                         ],
                       ),
 

@@ -6,11 +6,9 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:rooms/constant/constant.dart';
 import 'package:rooms/forgetPassword.dart';
 import 'package:rooms/newDontHaveaAccount.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:rooms/userProfilePafe.dart';
 import 'aeoui.dart';
 import 'package:http/http.dart'as http;
 
@@ -40,7 +38,7 @@ bool userexists=false;
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
-      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
     }
 
@@ -48,7 +46,7 @@ bool userexists=false;
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
-            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['mobile'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
+            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
             _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
           }
         }, onError: (OnLinkErrorException e) async {
@@ -57,13 +55,13 @@ bool userexists=false;
     });
   }
 
-  void createUser(String name,String mobile,String email,String password,String gender) async{
+  void createUser(String name,String phone,String email,String password,String gender) async{
    // final FirebaseAuth auth = FirebaseAuth.instance;
     //FirebaseUser user;
     //user=(await auth.createUserWithEmailAndPassword(email: email, password:password)).user;
     Firestore.instance.collection("users").document(email.toString()).setData({
       "name":name,
-      "mobile":mobile,
+      "phone":phone,
       "email":email,
       "gender":gender,
       "password":password,
@@ -121,7 +119,7 @@ bool userexists=false;
                 loggingin=true;
               });
               signInWithGoogle().whenComplete(() => Navigator.pushReplacement(context,MaterialPageRoute(builder: (context){
-                return AeoUI(username: email,);
+                return AeoUI(username: loggedInEmail,);
               }) ));
             },
             AssetImage(
@@ -194,6 +192,9 @@ bool userexists=false;
   void onLoginStatusChanged(bool isLoggedIn,{Map<String,dynamic> profileData}) {
     setState(() {
       if(isLoggedIn){
+        setState(() {
+          loggedInEmail=profileData['email'];
+        });
         Firestore.instance.collection("users").document("${profileData['email']}").get().then((doc){
           if(doc.exists){
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
@@ -201,6 +202,9 @@ bool userexists=false;
             }));
           }
           else{
+            setState(() {
+              loggedInEmail=profileData['email'];
+            });
             Firestore.instance.collection("users").document("${profileData['email']}").setData({
               "uid":profileData['access_token'],
               "name":profileData['name'],
@@ -211,14 +215,6 @@ bool userexists=false;
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
               return AeoUI(username: profileData['email'],);
             }));
-         /*   _scaffoldKey.currentState.showSnackBar(SnackBar(content: Row(
-              children: <Widget>[
-                Icon(Icons.warning),
-                Text("SignUp First Please",style: TextStyle(color: Colors.white),),
-              ],
-            ),backgroundColor: Colors.red,));
-
-          */
           }
         });
       }
@@ -380,6 +376,7 @@ bool userexists=false;
                               });
                               Firestore.instance.collection("users").document("${_emailController.text.trim()}").get().then((doc){
                                 if(doc.exists){
+                                  loggedInEmail=_emailController.text.trim();
                                   if(_passwordController.text.trim()==doc.data['password']){
                                     Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
                                       return AeoUI(username: _emailController.text.trim(),);
@@ -521,19 +518,18 @@ Future<String> signInWithGoogle() async {
   assert(user.uid == currentUser.uid);
 
   updateUserData(user);
-
   return 'signInWithGoogle succeeded: $user';
 }
 
 void signOutGoogle() async{
   await googleSignIn.signOut();
-
+  loggedInEmail="";
   print("User Sign Out");
 }
 
-String email;
+
 void updateUserData(FirebaseUser user) async {
-  email=user.email;
+  loggedInEmail=user.email;
   Firestore.instance.collection("users").document(user.email).get().then((value){
     if(!value.exists){
       DocumentReference ref = Firestore.instance.collection('users').document(user.email);

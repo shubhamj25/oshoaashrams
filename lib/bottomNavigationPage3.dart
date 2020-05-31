@@ -1,10 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'insidehotelBottom3.dart';
+import 'package:rooms/insideHotelPagefromSaved.dart';
 import 'organiserPageNotifications.dart';
 
+List<SavedEventCard> savedEvents=[];
+List<String> events=[];
 class SavedPage extends StatefulWidget {
+  final String email;
+  SavedPage({this.email});
   @override
   _SavedPageState createState() => _SavedPageState();
 }
@@ -12,575 +17,131 @@ class SavedPage extends StatefulWidget {
 class _SavedPageState extends State<SavedPage> {
   @override
   Widget build(BuildContext context) {
-    int _currentIndex = 0;
     return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: IconButton(
-            color: Colors.red,
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            icon: Icon(Icons.keyboard_backspace),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        title: Text(
-          "SAVED",
-          style: TextStyle(
-              color: Colors.red, fontWeight: FontWeight.w400, fontSize: 25.0),
-        ),
-        actions: [
-          Container(
-              margin: EdgeInsets.only(right: 15),
-              child: IconButton(
-                icon: Icon(Icons.notifications_active), color: Colors.red,
-                onPressed: () {
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          OrganiserNotifications()));
-                }, //notification Page of the consumer
-              ))
-        ],
-      ),
       body: new ListView(
         children: [
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical:20.0,horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Saved",
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold, fontSize: 35.0),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                    Text(
+                      "Events",
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold, fontSize: 30.0),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+
+                FloatingActionButton(
+                  heroTag: 1,
+                  backgroundColor: Colors.redAccent,
+                  child:Icon(Icons.notifications,color: Colors.white,),
+                  onPressed: () {
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            OrganiserNotifications()));
+                  },
+                )
+              ],),
           ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            children: <Widget>[
-              Stack(
-                children: [
-                  Card(
-                    elevation: 10.0,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                HotelDetailsPageSaved()));
-                      },
-                      child: Container(
-                        child: Column(
-                          children: <Widget>[
-                            Stack(
-                              children: [
-                                Image.asset(
-                                  'assets/images/53.PNG',
-                                ),
-                                new Positioned(
-                                  right: 0.0,
-                                  bottom: 0.0,
-                                  child: new Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 20.0,
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                "Parmarth Niketan Ashram",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+
+          StreamBuilder<QuerySnapshot>(
+            stream: Firestore.instance.collection("saved_${widget.email}").snapshots(),
+            builder: (context,snapshot){
+              savedEvents.clear();
+              if(snapshot.hasData){
+                for(int i=0;i<snapshot.data.documents.length;i++){
+                  savedEvents.add(SavedEventCard(snapshot.data.documents.elementAt(i).data['eventName'],snapshot.data.documents.elementAt(i).data['imageUrl']));
+                }
+              }
+              return !snapshot.hasData?Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: LinearProgressIndicator(),
+              )
+                  :
+               ListView(
+                 shrinkWrap: true,
+                 children: savedEvents,
+               );
+            },
+          )
+
         ],
+      ),
+    );
+  }
+}
+
+class SavedEventCard extends StatefulWidget {
+  final String imageUrl,title;
+  SavedEventCard(this.title,this.imageUrl);
+  @override
+  _SavedEventCardState createState() => _SavedEventCardState();
+}
+
+class _SavedEventCardState extends State<SavedEventCard> {
+  @override
+  Widget build(BuildContext context) {
+    return  Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        elevation: 10.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+        ),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(new MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    HotelDetailsPagefromSaved(eventName: widget.title,)));
+          },
+          child: Column(
+            children: <Widget>[
+              CachedNetworkImage(
+                imageUrl: widget.imageUrl,
+                fadeInDuration: Duration(milliseconds: 500),
+                fadeInCurve: Curves.easeIn,
+                imageBuilder: (context, imageProvider) => Container(
+                  width:350,
+                  height: 175,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    image: DecorationImage(
+                        image: imageProvider, fit: BoxFit.cover),
+                  ),
+                ),
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
