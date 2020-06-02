@@ -994,10 +994,15 @@ class _AeoUIState extends State<AeoUI> {
         _currentIndex=widget.currentState;
       });
     }
+    if(widget.username!=null){
+      setState(() {
+        loggedInEmail=widget.username;
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {
-    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(),SavedPage(email: widget.username,),UserProfileUI(widget.username)];
+    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(email: widget.username,),SavedPage(email: widget.username,),UserProfileUI(widget.username)];
     return SafeArea(
       child: Scaffold(
         drawer: Drawer(
@@ -1091,6 +1096,7 @@ class _AeoUIState extends State<AeoUI> {
                   "LogOut",
                       () {
                     signOutGoogle();
+                    loggedInEmail=null;
                     facebookLogin.logOut();
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>

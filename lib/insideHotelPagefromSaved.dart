@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'aeoui.dart';
+import 'bookEvent.dart';
 
 class HotelDetailsPagefromSaved extends StatefulWidget {
   final String eventName;
@@ -14,6 +15,7 @@ class HotelDetailsPagefromSaved extends StatefulWidget {
 class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
   List<Icon> starRating=[];
   bool favourite=false;
+  bool verifying=false;
   final GlobalKey<ScaffoldState> _scaffoldKey=new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
             stream: Firestore.instance.collection("events").document(widget.eventName).snapshots(),
             builder: (context, snapshot) {
               starRating.clear();
-              Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title']).get().then((doc){
+              Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'].toString()).get().then((doc){
                 setState(() {
                   if(doc.exists){
                     favourite=true;
@@ -52,12 +54,10 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
               }
               return !snapshot.hasData?Center(child: CircularProgressIndicator()):Stack(
                 children: <Widget>[
-
                   /*Container(
                     foregroundDecoration: BoxDecoration(color: Colors.black26),
                     height: 400,
                     child: Image.asset(image, fit: BoxFit.cover)),*/
-
                   CachedNetworkImage(
                     imageUrl: snapshot.data['imageUrl'],
                     fadeInDuration: Duration(milliseconds: 500),
@@ -178,7 +178,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                     color: Color.fromRGBO(253, 11, 23, 1),
                                     textColor: Colors.white,
                                     child: Text(
-                                      "Cancel",
+                                      "Book",
                                       style: TextStyle(fontWeight: FontWeight.normal),
                                     ),
                                     padding: const EdgeInsets.symmetric(
@@ -186,9 +186,41 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                       horizontal: 32.0,
                                     ),
                                     onPressed: () {
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              AeoUI()));
+                                      setState(() {
+                                        verifying=true;
+                                      });
+                                      Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
+                                        if((doc.data['name']!=null&&doc.data['name']!="")&&(doc.data['email']!=null&&doc.data['email']!="")&&(doc.data['gender']!=null&&doc.data['gender']!="")&&(doc.data['age']!=null&&doc.data['age']!="")){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context){
+                                            return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],);
+                                          }));
+                                        }
+                                        else{
+                                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                            content: Row(
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal:5.0),
+                                                  child: Icon(Icons.error,color: Colors.white,),
+                                                ),
+                                                Expanded(
+                                                  child: Text("Complete your profile first from the dashboard",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.white,
+                                                      fontSize: 16.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            backgroundColor: Color.fromRGBO(253, 11, 23, 1),
+                                          ));
+                                        }
+                                        setState(() {
+                                          verifying=false;
+                                        });
+                                      });
                                     },
                                   ),
                                   RaisedButton(
@@ -244,8 +276,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                           ],
                                         ),
                                         backgroundColor: Color.fromRGBO(253, 11, 23, 1),
-                                      ))
-                                      ;
+                                      ));
 
 //                                Navigator.of(context).push(MaterialPageRoute(
 //                                    builder: (BuildContext context) =>
@@ -273,20 +304,21 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                       ],
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back,color: Colors.white,size: 25.0,),
-                        onPressed:()=> Navigator.pushReplacement(context,MaterialPageRoute(
-                          builder: (context){
-                            return AeoUI(username: loggedInEmail,currentState: 3,);
-                          }
-                        )),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: AppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      centerTitle: true,
+                      title: Text(
+                        "",
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal),
                       ),
                     ),
                   ),
+                  verifying?LinearProgressIndicator():Container()
                 ],
               );
             }

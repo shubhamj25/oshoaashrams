@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rooms/bookEvent.dart';
+import 'package:rooms/bottomnavigationpage2.dart';
 import 'aeoui.dart';
 
 class HotelDetailsPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class HotelDetailsPage extends StatefulWidget {
 class _HotelDetailsPageState extends State<HotelDetailsPage> {
   List<Icon> starRating=[];
   bool favourite=false;
+  bool verifying=false;
   final GlobalKey<ScaffoldState> _scaffoldKey=new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
@@ -24,7 +27,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
           stream: Firestore.instance.collection("events").document(widget.eventName).snapshots(),
           builder: (context, snapshot) {
             starRating.clear();
-            Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title']).get().then((doc){
+            Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'].toString()).get().then((doc){
               setState(() {
                 if(doc.exists){
                     favourite=true;
@@ -178,7 +181,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                   color: Color.fromRGBO(253, 11, 23, 1),
                                   textColor: Colors.white,
                                   child: Text(
-                                    "Cancel",
+                                    "Book",
                                     style: TextStyle(fontWeight: FontWeight.normal),
                                   ),
                                   padding: const EdgeInsets.symmetric(
@@ -186,9 +189,41 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                     horizontal: 32.0,
                                   ),
                                   onPressed: () {
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            AeoUI()));
+                                    setState(() {
+                                      verifying=true;
+                                    });
+                                    Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
+                                      if((doc.data['name']!=null&&doc.data['name']!="")&&(doc.data['email']!=null&&doc.data['email']!="")&&(doc.data['gender']!=null&&doc.data['gender']!="")&&(doc.data['age']!=null&&doc.data['age']!="")){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context){
+                                          return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],);
+                                        }));
+                                      }
+                                      else{
+                                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                          content: Row(
+                                            children: <Widget>[
+                                              Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal:5.0),
+                                                child: Icon(Icons.error,color: Colors.white,),
+                                              ),
+                                              Expanded(
+                                                child: Text("Complete your profile first from the dashboard",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.white,
+                                                    fontSize: 16.0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: Color.fromRGBO(253, 11, 23, 1),
+                                        ));
+                                      }
+                                      setState(() {
+                                        verifying=false;
+                                      });
+                                    });
                                   },
                                 ),
                                 RaisedButton(
@@ -244,8 +279,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                         ],
                                       ),
                                       backgroundColor: Color.fromRGBO(253, 11, 23, 1),
-                                    ))
-                                    ;
+                                    ));
 
 //                                Navigator.of(context).push(MaterialPageRoute(
 //                                    builder: (BuildContext context) =>
@@ -287,6 +321,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                     ),
                   ),
                 ),
+                verifying?LinearProgressIndicator():Container()
               ],
             );
           }

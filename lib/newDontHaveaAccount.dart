@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:rooms/constant/constant.dart';
-import 'package:rooms/newLoginscreen2.dart';
+import 'aeoui.dart';
 
 
 String apiKey="Nzg1MDYjIyMyMDE4LTA2LTA2IDE2OjUzOjQ1";
@@ -51,20 +51,24 @@ class _NewSinupState extends State<NewSinup> {
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
-      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-        return NewLoginScreenTwo(message: "SignUp Successful",);
-      }));
+      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['gender']);
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context){
+            return AeoUI(username: deepLink.queryParameters['email'],currentState: 4,);
+          }
+      ));
     }
 
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
-            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
-              return NewLoginScreenTwo(message: "SignUp Successful",);
-            }));
+            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['gender']);
+            Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context){
+                  return AeoUI(username: deepLink.queryParameters['email'],currentState: 4,);
+                }
+            ));
           }
         }, onError: (OnLinkErrorException e) async {
       print('onLinkError');

@@ -18,8 +18,7 @@ class _OnGoingEventsState extends State<OnGoingEvents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        body: ListView(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical:20.0,horizontal: 20.0),
@@ -63,9 +62,11 @@ class _OnGoingEventsState extends State<OnGoingEvents> {
                     ongoingEvents.add(OngoingEventCard(snapshot.data.documents.elementAt(i).data['title'],snapshot.data.documents.elementAt(i).data['imageUrl']));
                   }
                 }
-                return snapshot.hasData ?ListView(
-                  shrinkWrap: true,
-                  children: ongoingEvents,
+                return snapshot.hasData ?SingleChildScrollView(
+                  child: Column(
+                    
+                    children: ongoingEvents,
+                  ),
                 ):Padding(
                   padding: const EdgeInsets.all(32.0),
                   child: LinearProgressIndicator(),
@@ -89,7 +90,7 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
   @override
   Widget build(BuildContext context) {
     return  Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 6.0),
       child: Card(
         elevation: 10.0,
         shape: RoundedRectangleBorder(
@@ -116,7 +117,10 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
                         image: imageProvider, fit: BoxFit.cover),
                   ),
                 ),
-                placeholder: (context, url) => CircularProgressIndicator(),
+                placeholder: (context, url) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical:32.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
                 errorWidget: (context, url, error) => Icon(Icons.error),
               ),
               SizedBox(

@@ -68,9 +68,11 @@ class _SavedPageState extends State<SavedPage> {
                 child: LinearProgressIndicator(),
               )
                   :
-               ListView(
-                 shrinkWrap: true,
-                 children: savedEvents,
+               SingleChildScrollView(
+                 child: Column(
+                   children: savedEvents,
+                 ),
+                                
                );
             },
           )
@@ -119,7 +121,10 @@ class _SavedEventCardState extends State<SavedEventCard> {
                         image: imageProvider, fit: BoxFit.cover),
                   ),
                 ),
-                placeholder: (context, url) => CircularProgressIndicator(),
+                placeholder: (context, url) => Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: CircularProgressIndicator(),
+                ),
                 errorWidget: (context, url, error) => Icon(Icons.error),
               ),
               SizedBox(

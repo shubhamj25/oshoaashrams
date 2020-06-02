@@ -38,16 +38,29 @@ bool userexists=false;
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
-      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
-     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+      setState(() {
+        loggingin=true;
+      });
+      createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['gender']);
+    // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context){
+            return AeoUI(username: deepLink.queryParameters['email'],currentState: 4,);
+          }
+      ));
     }
 
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
-            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['password']);
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+            createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['gender']);
+            //_scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
+            Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context){
+                return AeoUI(username: deepLink.queryParameters['email'],currentState: 4,);
+              }
+            ));
           }
         }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
@@ -118,9 +131,9 @@ bool userexists=false;
               setState(() {
                 loggingin=true;
               });
-              signInWithGoogle().whenComplete(() => Navigator.pushReplacement(context,MaterialPageRoute(builder: (context){
+              signInWithGoogle().whenComplete(() => loggedInEmail!=null||loggedInEmail!=""?Navigator.pushReplacement(context,MaterialPageRoute(builder: (context){
                 return AeoUI(username: loggedInEmail,);
-              }) ));
+              }) ):null);
             },
             AssetImage(
               'assets/images/google.jpg',

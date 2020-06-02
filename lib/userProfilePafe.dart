@@ -8,7 +8,9 @@ import 'package:rooms/hisroryAndWallet.dart';
 import 'package:rooms/profileImg.dart';
 import 'package:rooms/widgets/customshape.dart';
 
+import 'aeoui.dart';
 import 'helpAndSupport.dart';
+import 'newLoginscreen2.dart';
 
 class UserProfileUI extends StatefulWidget {
   String email;
@@ -20,7 +22,7 @@ class UserProfileUI extends StatefulWidget {
 class _UserProfileUIState extends State<UserProfileUI> {
   String msg = 'Hey Friends try this OSHO app';
   String base64Image = '';
-
+  final agecontroller=TextEditingController();
   int  _selectedGender=0;
   String gender;
   List<DropdownMenuItem<int>> genderList = [
@@ -71,6 +73,7 @@ int retGender(AsyncSnapshot snapshot){
 }
   bool phoneError=false;
   bool hidepass=true;
+  bool ageerror=false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -95,7 +98,7 @@ int retGender(AsyncSnapshot snapshot){
                                 child: snapshot.data['photoURL']!=null?CircleAvatar(
                                     radius: 70,
                                     backgroundColor: Colors.white,
-                                    backgroundImage: NetworkImage(snapshot.data['photoURL'])):Icon(Icons.account_circle,size: 80.0,color: Colors.blueAccent,),
+                                    backgroundImage: NetworkImage(snapshot.data['photoURL'])):Material(shape: CircleBorder(),elevation: 12.0,child: Icon(Icons.account_circle,size: 140.0,color: Colors.blueAccent,)),
                               ),
                               Positioned(
                                 top: MediaQuery.of(context).size.height*0.3,
@@ -121,8 +124,14 @@ int retGender(AsyncSnapshot snapshot){
                                         return StatefulBuilder(
                                           builder: (context,setState){
                                             return Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: ImageCapture(widget.email),
+                                              padding: const EdgeInsets.symmetric(vertical:20.0),
+                                              child: AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                                ),
+                                                contentPadding: const EdgeInsets.all(0),
+                                                content: ImageCapture(widget.email),
+                                              ),
                                             );
                                           },
                                         );
@@ -131,7 +140,25 @@ int retGender(AsyncSnapshot snapshot){
                                     },
                                   ),
                                 ),
-                              )
+                              ),
+                              Positioned(
+                                top:20.0,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(Icons.notifications,color: Colors.white,size: 30.0,),
+                                    ),
+                                    Text("Do Complete your profile\nIts Mandatory for Bookings",textAlign: TextAlign.left,style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white
+                                    ),),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
 
@@ -252,7 +279,7 @@ int retGender(AsyncSnapshot snapshot){
                         )),
                         DataCell(
                             TextFormField(
-
+                              keyboardType: TextInputType.phone,
                               initialValue: "${snapshot.data['phone']!=null?snapshot.data['phone']:"Enter Phone Number"}",
                               style: TextStyle(fontWeight: FontWeight.w300, color: !phoneError?Colors.blue:Colors.red),
                               onChanged: (String value){
@@ -317,6 +344,33 @@ int retGender(AsyncSnapshot snapshot){
                                 underline: null,
                               ),
                             )
+                        )
+                      ],
+                    ),
+                    DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(
+                          "Age",
+                          style:
+                          TextStyle(fontWeight: FontWeight.w400, color: Colors.black),
+                        )),
+                        DataCell(
+                          TextFormField(
+                            initialValue: "${snapshot.data['age']!=null?snapshot.data['age']:"Enter Age"}",
+                            style: TextStyle(fontWeight: FontWeight.w300, color: Colors.blue),
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              focusedBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                            ),
+                            onChanged: (var val){
+                              setState(() {
+                                  Firestore.instance.collection("users").document(widget.email).updateData({
+                                    "age": val,
+                                  });
+                              });
+                            },
+                          ),
                         )
                       ],
                     ),
@@ -466,6 +520,14 @@ int retGender(AsyncSnapshot snapshot){
                               Icons.touch_app,
                               color: Color.fromRGBO(253, 11, 23, 1),
                             ),
+                            onTap: (){
+                              signOutGoogle();
+                              loggedInEmail=null;
+                              facebookLogin.logOut();
+                              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      NewLoginScreenTwo()));
+                            },
                             title: Text(
                               "Log Out",
                               style: GoogleFonts.balooBhaina(fontWeight: FontWeight.w400),
