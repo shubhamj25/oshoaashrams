@@ -24,6 +24,7 @@ import 'organiserPageNotifications.dart';
 import 'widgets/customshape.dart';
 
 String loggedInEmail;
+Color deepRed=Color.fromRGBO(253, 11, 23, 1);
 class HomePage extends StatefulWidget {
   final String username;
   HomePage({this.username});

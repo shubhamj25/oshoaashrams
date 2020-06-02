@@ -213,7 +213,7 @@ int retGender(AsyncSnapshot snapshot){
                             color: Color.fromRGBO(253, 11, 23, 1),
                             onPressed: () {
                               Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => MyRide()));
+                                  builder: (BuildContext context) => MyRide(userName:snapshot.data['name'],userEmail: snapshot.data['email'],age: snapshot.data['age'],gender: snapshot.data['gender'],img: snapshot.data['photoURL'],)));
                             },
                             icon: Icon(
                               Icons.directions_car,

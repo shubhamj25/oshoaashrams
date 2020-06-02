@@ -42,6 +42,7 @@ dependencies:
   firebase_core:
   groovin_widgets:
   cloud_functions:
+  shared_preferences:
   image_cropper:
   image_picker:
   toggle_switch:
