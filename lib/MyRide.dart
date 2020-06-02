@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/addingNewRides.dart';
 import 'package:rooms/aeoui.dart';
@@ -719,69 +720,74 @@ class _ChatCardState extends State<ChatCard> {
           subtitle: Text("Osho Customer",style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.w500)),
           trailing: Icon(Icons.add_comment,color: Colors.black,),
           onTap: (){
-            showDialog(context: context,
-            builder: (context){
-              return StatefulBuilder(
-                builder: (context,setState){
-                  return AlertDialog(
-                    content: Scaffold(
-                      body: Column(
-                        children: <Widget>[
-                          StreamBuilder<QuerySnapshot>(
-                            stream: Firestore.instance
-                                .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").snapshots(),
-                            builder: (context, snapshot) {
-                              return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
-                                alignment: Alignment.topCenter,
-                                child: Container(
-                                  height: 350.0,
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.all(10.0),
-                                    itemBuilder: (context, index){
-                                      if(snapshot.data.documents.elementAt(index).data['accountEmail']!=loggedInEmail) {
-                                        return Chat("${snapshot.data.documents.elementAt(index).data['message']}","peer");
-                                      }
-                                      else{
-                                        return Chat("${snapshot.data.documents.elementAt(index).data['message']}","current");
-                                      }
-                                    },
-                                    itemCount: snapshot.data.documents.length,
-                                    reverse: true,
-                                  ),
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context){
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text("Chat"),
+                    leading: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: ()=>Navigator.pop(context),
+                    ),
+                  ),
+                  body: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        StreamBuilder<QuerySnapshot>(
+                          stream: Firestore.instance
+                              .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
+                          builder: (context, snapshot) {
+                            return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                height: MediaQuery.of(context).size.height*0.8,
+                                child: ListView.builder(
+                                  padding: EdgeInsets.all(10.0),
+                                  itemBuilder: (context, index){
+                                    if(snapshot.data.documents.elementAt(index).data['accountEmail']!=loggedInEmail) {
+                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","peer");
+                                    }
+                                    else{
+                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","current");
+                                    }
+                                  },
+                                  itemCount: snapshot.data.documents.length,
+                                  reverse: true,
+                                  shrinkWrap: true,
                                 ),
-                              );
-                            },
-                          ),
-                          Material(
-                            child: TextFormField(
-                             controller: _messageController,
-                              style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w700),
-                              decoration: InputDecoration(
-                                labelStyle:TextStyle(fontSize: MediaQuery.of(context).size.width*0.045),
-                                labelText: "Type a message",
-                                contentPadding: EdgeInsets.symmetric(horizontal: 18.0,vertical: 5.0),
-                                suffixIcon: IconButton(
-                                    icon: Icon(Icons.send,size:25.0,color: Colors.black,),
-                                    onPressed: (){
-                                      Firestore.instance
-                                          .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").add({
-                                        "message":_messageController.text,
-                                        "accountEmail":loggedInEmail,
-                                      });
-                                    },
-                                ),
-                                border: InputBorder.none,
                               ),
+                            );
+                          },
+                        ),
+                        Material(
+                          child: TextFormField(
+                            controller: _messageController,
+                            style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w700),
+                            decoration: InputDecoration(
+                              labelStyle:TextStyle(fontSize: MediaQuery.of(context).size.width*0.045),
+                              labelText: "Type a message",
+                              contentPadding: EdgeInsets.symmetric(horizontal: 18.0,vertical: 5.0),
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.send,size:25.0,color: Colors.black,),
+                                onPressed: (){
+                                  Firestore.instance
+                                      .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").add({
+                                    "message":_messageController.text,
+                                    "accountEmail":loggedInEmail,
+                                    'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+                                  });
+                                },
+                              ),
+                              border: InputBorder.none,
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  );
-                },
-              );
-            }
-            );
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            ));
           },
         ),
       ),
