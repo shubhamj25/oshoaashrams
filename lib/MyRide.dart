@@ -42,7 +42,7 @@ class _MyRideState extends State<MyRide> {
                   ),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.blue,
+                backgroundColor: deepRed,
                 bottom: TabBar(
 
                   labelColor: Colors.white,
@@ -208,7 +208,7 @@ class _MyRideState extends State<MyRide> {
                         ListView.builder(
                           itemCount: snapshot.data.documents.length,
                           itemBuilder: (context,i){
-                            if(snapshot.data.documents.elementAt(0).documentID.contains("info")){
+                            if(snapshot.data.documents.elementAt(i).documentID.contains("info")){
                               return ChatCard(loggedInEmail,snapshot.data.documents.elementAt(i).data['email'],
                                   snapshot.data.documents.elementAt(i).data['image'],snapshot.data.documents.elementAt(i).data['name']);
                             }
@@ -241,6 +241,7 @@ class RideCard extends StatefulWidget {
 
 class _RideCardState extends State<RideCard> {
   bool requestSent=false;
+  String status="Request Status";
   @override
   void initState() {
     // TODO: implement initState
@@ -261,7 +262,7 @@ class _RideCardState extends State<RideCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:14.0,vertical: 5.0),
       child: Card(
-        color: Color.fromRGBO(253, 11, 23, 1),
+        color: Colors.lightBlue,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all((Radius.circular(12.0))),
         ),
@@ -276,8 +277,8 @@ class _RideCardState extends State<RideCard> {
                   child: Material(
                     shape: CircleBorder(),
                     child: Container(
-                      width: MediaQuery.of(context).size.width*0.35,
-                      height: MediaQuery.of(context).size.width*0.35,
+                      width: MediaQuery.of(context).size.width*0.32,
+                      height: MediaQuery.of(context).size.width*0.32,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white,width: 3.0),
@@ -303,7 +304,7 @@ class _RideCardState extends State<RideCard> {
                   ),
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width*0.4,
+                  width: MediaQuery.of(context).size.width*0.46,
                   height: 100.0,
                   child: ListView(
                     shrinkWrap: true,
@@ -312,13 +313,13 @@ class _RideCardState extends State<RideCard> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Interested",style:TextStyle(color:requestSent?Colors.white:Color.fromRGBO(253, 11, 23, 1),fontSize: 16,fontWeight: FontWeight.w600),),
+                            Text("Interested",style:GoogleFonts.aBeeZee(color:requestSent?Colors.green:Color.fromRGBO(253, 11, 23, 1),fontSize: 16,fontWeight: FontWeight.w600),),
                             Padding(
                               padding: const EdgeInsets.all(5.0),
-                              child: Icon(requestSent?Icons.check_circle:Icons.drive_eta,color:requestSent?Colors.white:Color.fromRGBO(253, 11, 23, 1)),
+                              child: Icon(requestSent?Icons.check_circle:Icons.drive_eta,color:requestSent?Colors.green:Color.fromRGBO(253, 11, 23, 1)),
                             ),
                           ],
-                        ),color:requestSent?Colors.green:Colors.white,
+                        ),color:Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all((Radius.circular(8.0))),
                         ),
@@ -343,6 +344,9 @@ class _RideCardState extends State<RideCard> {
                                 });
                               }
                               else{
+                                setState(() {
+                                  status="Canceled";
+                                });
                                 requestSent=false;
                                 Firestore.instance.collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").delete();
                               }
@@ -351,15 +355,7 @@ class _RideCardState extends State<RideCard> {
                         },
                       ),
                       RaisedButton(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal:8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Expanded(child: Text(requestSent?"Request Sent":"Status",style:TextStyle(color: requestSent?Colors.green:Colors.blue,fontSize: 16,fontWeight: FontWeight.w600))),
-                            ],
-                          ),
-                        ),
+                        child: Text(requestSent?"Request Sent":status,style:GoogleFonts.aBeeZee(color: !requestSent&&status!="Request Status"?deepRed:Colors.blueAccent,fontSize: 16,fontWeight: FontWeight.w600)),
                         color: Colors.white,
                         onPressed:()=>null,
                         shape: RoundedRectangleBorder(
@@ -379,11 +375,11 @@ class _RideCardState extends State<RideCard> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
-                     title: Text(widget.userName,style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.w600),),
+                     title: Text(widget.userName,style: GoogleFonts.aBeeZee(fontSize: 19.0,fontWeight: FontWeight.w600),),
                     subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo}"
                         " on ${widget.start}.${widget.gender=="Male"?'He':'She'} is ${widget.age} years old and would be staying at ${widget.travellingTo} till ${widget.end}."
-                    ,style: TextStyle(
-                     fontSize: 18.0,fontWeight: FontWeight.w500,
+                    ,style: GoogleFonts.aBeeZee(
+                     fontSize: 17.0,fontWeight: FontWeight.w500,
                     ),
                     ),
                 ),
@@ -410,7 +406,7 @@ class _RequestCardState extends State<RequestCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
       child: Card(
-        color: Color.fromRGBO(253, 11, 23, 1),
+        color: Colors.lightBlue,
         elevation: 12.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12.0)),
@@ -462,7 +458,7 @@ class _RequestCardState extends State<RequestCard> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text(reqAccepted?"Accepted":"Accept",style:TextStyle(color:reqAccepted?Colors.white:Colors.green,fontSize: 16,fontWeight: FontWeight.w600),),
+                            Text(reqAccepted?"Accepted":"Accept",style:GoogleFonts.aBeeZee(color:reqAccepted?Colors.white:Colors.green,fontSize: 16,fontWeight: FontWeight.w600),),
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Icon(reqAccepted?Icons.check_circle:Icons.drive_eta,color:reqAccepted?Colors.white:Colors.green,
@@ -493,7 +489,7 @@ class _RequestCardState extends State<RequestCard> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text("Reject",style:TextStyle(color: Colors.red,fontSize: 16,fontWeight: FontWeight.w600)),
+                            Text("Reject",style:GoogleFonts.aBeeZee(color: Colors.red,fontSize: 16,fontWeight: FontWeight.w600)),
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Icon(Icons.close,color: Colors.red),
@@ -519,8 +515,8 @@ class _RequestCardState extends State<RequestCard> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
-                  title: Text("Ride request from ${widget.email}",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),
-                  subtitle: Text("${widget.name} has requested to join your ride ...",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                  title: Text("Ride request from ${widget.email}",style: GoogleFonts.aBeeZee(fontSize: 18,fontWeight: FontWeight.w600),),
+                  subtitle: Text("${widget.name} has requested to join your ride ...",style: GoogleFonts.aBeeZee(fontSize: 16,fontWeight: FontWeight.w500)),
                 ),
               ),
             ),
@@ -540,6 +536,7 @@ class CurrentRideCard extends StatefulWidget {
 }
 
 class _CurrentRideCardState extends State<CurrentRideCard> {
+  int ridePeeps;
   bool isActive=true;
   bool inTouch=false;
   bool ownRide=false;
@@ -570,11 +567,14 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
     });
     Firestore.instance.collection("rides").document(widget.userName).get().then((value){
       setState(() {
-        if(value.data['email']==loggedInEmail||value.data['status']=="inactive"){
-          ownRide=true;
-        }
-        else{
-          ownRide=false;
+        if(value.exists){
+          if(value.data['email']==loggedInEmail||value.data['status']=="inactive"){
+            ownRide=true;
+            ridePeeps=List.from(value.data['persons']).length;
+          }
+          else{
+            ownRide=false;
+          }
         }
       });
     });
@@ -584,7 +584,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:14.0,vertical: 5.0),
       child: Card(
-          color: Color.fromRGBO(253, 11, 23, 1),
+          color: Colors.lightBlue,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all((Radius.circular(12.0))),
           ),
@@ -635,7 +635,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text(inTouch?"In Touch":"Message",style:TextStyle(color: Colors.blueAccent,fontSize: 16,fontWeight: FontWeight.w600)),
+                              Text(inTouch?"In Touch":"Message",style:GoogleFonts.aBeeZee(color: Colors.blueAccent,fontSize: 16,fontWeight: FontWeight.w600)),
                               Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: Icon(inTouch?Icons.touch_app:Icons.send,color: Colors.blueAccent),
@@ -655,7 +655,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                                           padding: const EdgeInsets.symmetric(horizontal:8.0),
                                           child: Icon(Icons.info,color: Colors.white,size: 35,),
                                         ),
-                                        Expanded(child: Text("You have a new Chat !\nPlease check your chat list",style: TextStyle(fontSize: 16.0,color: Colors.white),))
+                                        Expanded(child: Text("You have a new Chat !\nPlease check your chat list",style: GoogleFonts.aBeeZee(fontSize: 16.0,color: Colors.white),))
                                       ],
                                     ),
                                   )
@@ -671,7 +671,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                                           padding: const EdgeInsets.symmetric(horizontal:8.0),
                                           child: Icon(Icons.info,color: Colors.white,size: 35,),
                                         ),
-                                        Expanded(child: Text("Already in Touch!\nPlease check your chat list",style: TextStyle(fontSize: 16.0,color: Colors.white),))
+                                        Expanded(child: Text("Already in Touch!\nPlease check your chat list",style: GoogleFonts.aBeeZee(fontSize: 16.0,color: Colors.white),))
                                       ],
                                     ),
                                   )
@@ -692,7 +692,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                                   padding: const EdgeInsets.all(5.0),
                                   child: Icon(isActive?Icons.fiber_manual_record:Icons.stop,color:isActive?Colors.green:Colors.red),
                                 ),
-                                Text(isActive?"Active":"InActive",style:TextStyle(color: isActive?Colors.green:Colors.red,fontSize: 16,fontWeight: FontWeight.w600)),
+                                Text(isActive?"ACTIVE":"ENDED",style:GoogleFonts.aBeeZee(color: isActive?Colors.green:Colors.red,fontSize: 16,fontWeight: FontWeight.w500)),
                               ],
                             ),
                           ),
@@ -702,6 +702,17 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                             borderRadius: BorderRadius.all((Radius.circular(8.0))),
                           ),
                         ),
+                        ownRide?RaisedButton(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal:8.0),
+                            child: Text("$ridePeeps People",style:GoogleFonts.aBeeZee(color: Colors.black54,fontSize: 16,fontWeight: FontWeight.w600)),
+                          ),
+                          color: Colors.white,
+                          onPressed:()=>null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all((Radius.circular(8.0))),
+                          ),
+                        ):Container(),
                       ],
                     ),
                   )
@@ -716,11 +727,11 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
-                        title: Text(widget.userName,style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.w600),),
+                        title: Text(widget.userName,style: GoogleFonts.aBeeZee(fontSize: 19.0,fontWeight: FontWeight.w600),),
                         subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo}"
                             " on ${widget.start}.${widget.gender=="Male"?'He':'She'} is ${widget.age} years old and would be staying at ${widget.travellingTo} till ${widget.end}."
-                          ,style: TextStyle(
-                            fontSize: 18.0,fontWeight: FontWeight.w500,
+                          ,style: GoogleFonts.aBeeZee(
+                            fontSize: 17.0,
                           ),
                         ),
                       ),
@@ -731,12 +742,12 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                     child: Container(
                       child:Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("End Ride",textAlign:TextAlign.center,style:TextStyle(color:Colors.white,fontSize: 20.0,fontWeight: FontWeight.w600)),
+                        child: Text("End Ride",textAlign:TextAlign.center,style:GoogleFonts.aBeeZee(color:Colors.white,fontSize: 20.0,fontWeight: FontWeight.w600)),
                       ),
                       height: 40.0,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent,
+                        color: deepRed,
                         borderRadius: BorderRadius.only(bottomLeft:Radius.circular(12.0),bottomRight: Radius.circular(12.0)),
                       ),
                     ),
@@ -804,8 +815,8 @@ class _ChatCardState extends State<ChatCard> {
               ),
             ),
           ),
-          title: Text(widget.chatToName,style: TextStyle(fontSize: 18.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
-          subtitle: Text("Osho Customer",style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.w500)),
+          title: Text(widget.chatToName,style: GoogleFonts.aBeeZee(fontSize: 18.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
+          subtitle: Text("Osho Customer",style: GoogleFonts.aBeeZee(fontSize: 16.0,fontWeight: FontWeight.w500)),
           trailing: IconButton(icon: Icon(Icons.delete,color: deepRed,),
           onPressed: (){
             Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
@@ -857,9 +868,9 @@ class _ChatCardState extends State<ChatCard> {
                           elevation: 20.0,
                           child: TextFormField(
                             controller: _messageController,
-                            style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w500),
+                            style: GoogleFonts.aBeeZee(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w500),
                             decoration: InputDecoration(
-                              labelStyle:TextStyle(fontSize: MediaQuery.of(context).size.width*0.045),
+                              labelStyle:GoogleFonts.aBeeZee(fontSize: MediaQuery.of(context).size.width*0.045),
                               labelText: "Type a message",
                               contentPadding: EdgeInsets.symmetric(horizontal: 18.0,vertical: 5.0),
                               suffixIcon: IconButton(
@@ -963,10 +974,10 @@ class _ChatState extends State<Chat> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(widget.message,style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.w500,color: Colors.white),),
+                    Text(widget.message,style: GoogleFonts.aBeeZee(fontSize: 18.0,fontWeight: FontWeight.w500,color: Colors.white),),
                     Padding(
                       padding: const EdgeInsets.only(top:2.0),
-                      child: Text("${widget.timestamp.day} ${month(widget.timestamp.month)}@${widget.timestamp.hour}:${widget.timestamp.minute} hrs",textAlign: TextAlign.right,style: TextStyle(color: Colors.white,fontSize: 10.0),),
+                      child: Text("${widget.timestamp.day} ${month(widget.timestamp.month)}@${widget.timestamp.hour}:${widget.timestamp.minute} hrs",textAlign: TextAlign.right,style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 10.0),),
                     )
                   ],
                 ),

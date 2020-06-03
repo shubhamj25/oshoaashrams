@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:groovin_widgets/groovin_expansion_tile.dart';
+import 'package:rooms/aeoui.dart';
 import 'organiserPageNotifications.dart';
 
 
@@ -113,7 +114,7 @@ class _BookingCardState extends State<BookingCard> {
         defaultTrailingIconColor: Colors.white,
         initiallyExpanded: false,
         boxDecoration: BoxDecoration(
-            color: Colors.blueAccent,
+            color: deepRed,
             borderRadius: BorderRadius.only(topRight: Radius.circular(16.0),bottomLeft: Radius.circular(16.0)),
             boxShadow: [
               BoxShadow(
