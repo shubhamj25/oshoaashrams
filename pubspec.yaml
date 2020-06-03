@@ -43,6 +43,7 @@ dependencies:
   groovin_widgets:
   cloud_functions:
   shared_preferences:
+  flutter_advanced_networkimage: ^0.7.0
   image_cropper:
   image_picker:
   toggle_switch:

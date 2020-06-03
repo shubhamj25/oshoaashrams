@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/addingNewRides.dart';
 import 'package:rooms/aeoui.dart';
@@ -828,7 +829,7 @@ class _ChatCardState extends State<ChatCard> {
               builder: (context){
                 return Scaffold(
                   appBar: AppBar(
-                    title: Text(widget.chatToName),
+                    title: Text(widget.chatToName,style: GoogleFonts.aBeeZee(color: Colors.white),),
                     backgroundColor: deepRed,
                     leading: IconButton(
                       icon: Icon(Icons.close),
@@ -848,8 +849,9 @@ class _ChatCardState extends State<ChatCard> {
                                 decoration: BoxDecoration(
                                   image:DecorationImage(
                                     fit: BoxFit.cover,
-                                    image: CachedNetworkImageProvider(
+                                    image: AdvancedNetworkImage(
                                       "https://firebasestorage.googleapis.com/v0/b/osho-b6c37.appspot.com/o/chat.jpg?alt=media&token=2890e2bd-c005-46cc-ac11-2443655ed059",
+                                      useDiskCache: true,
                                     ),
                                     )
                                 ),
