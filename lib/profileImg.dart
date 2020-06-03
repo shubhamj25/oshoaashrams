@@ -94,7 +94,6 @@ class _ImageCaptureState extends State<ImageCapture> {
                 child: Uploader(file:_imageFile,email: widget.email,),
               ),
             ],
-
             if(_imageFile==null)
               Stack(
                 alignment: Alignment.bottomCenter,
