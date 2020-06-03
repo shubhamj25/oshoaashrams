@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/addingNewRides.dart';
 import 'package:rooms/aeoui.dart';
@@ -182,7 +181,9 @@ class _MyRideState extends State<MyRide> {
                                 snapshot.data.documents.elementAt(i).data['name'],
                                 snapshot.data.documents.elementAt(i).data['fromEmail'],
                                 snapshot.data.documents.elementAt(i).data['age'],
-                                snapshot.data.documents.elementAt(i).data['gender']));
+                                snapshot.data.documents.elementAt(i).data['gender'],
+                                snapshot.data.documents.elementAt(i).data['rideBy'],
+                            ));
                           }
                         }
                         return !snapshot.hasData?Center(child: CircularProgressIndicator()):
@@ -336,6 +337,7 @@ class _RideCardState extends State<RideCard> {
                                       "gender":doc.data['gender'],
                                       "image":doc.data['photoURL'],
                                       "persons":ridePersons,
+                                      "rideBy":widget.userName,
                                     });
                                   }
                                 });
@@ -395,8 +397,8 @@ class _RideCardState extends State<RideCard> {
 }
 
 class RequestCard extends StatefulWidget {
-  final String img,name,email,age,gender;
-  RequestCard(this.img,this.name,this.email,this.age,this.gender);
+  final String img,name,email,age,gender,loggedInName;
+  RequestCard(this.img,this.name,this.email,this.age,this.gender, this.loggedInName);
   @override
   _RequestCardState createState() => _RequestCardState();
 }
@@ -475,10 +477,10 @@ class _RequestCardState extends State<RequestCard> {
                           setState(() {
                             setState(() {
                               if(reqAccepted==false){
-                                reqAccepted=true;
-                                Firestore.instance.collection("rides").document(widget.name).updateData({
+                                Firestore.instance.collection("rides").document(widget.loggedInName).updateData({
                                   "persons":FieldValue.arrayUnion([widget.email]),
                                 });
+                                reqAccepted=true;
                               }else{
                                 reqAccepted=false;
                               }
@@ -517,7 +519,7 @@ class _RequestCardState extends State<RequestCard> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
-                  title: Text("Ride request from ${widget.name}",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),
+                  title: Text("Ride request from ${widget.email}",style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600),),
                   subtitle: Text("${widget.name} has requested to join your ride ...",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
                 ),
               ),
@@ -540,6 +542,7 @@ class CurrentRideCard extends StatefulWidget {
 class _CurrentRideCardState extends State<CurrentRideCard> {
   bool isActive=true;
   bool inTouch=false;
+  bool ownRide=false;
   BorderRadius contentBorder=BorderRadius.all(Radius.circular(0));
   @override
   void initState() {
@@ -562,6 +565,16 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
         }
         else{
           inTouch=false;
+        }
+      });
+    });
+    Firestore.instance.collection("rides").document(widget.userName).get().then((value){
+      setState(() {
+        if(value.data['email']==loggedInEmail||value.data['status']=="inactive"){
+          ownRide=true;
+        }
+        else{
+          ownRide=false;
         }
       });
     });
@@ -618,7 +631,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                     child: ListView(
                       shrinkWrap: true,
                       children: <Widget>[
-                        RaisedButton(
+                        !ownRide?RaisedButton(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -668,7 +681,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all((Radius.circular(8.0))),
                           ),
-                        ),
+                        ):Container(),
                         RaisedButton(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal:8.0),
@@ -816,7 +829,7 @@ class _ChatCardState extends State<ChatCard> {
                       children: <Widget>[
                         StreamBuilder<QuerySnapshot>(
                           stream: Firestore.instance
-                              .collection("chat_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
+                              .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
                           builder: (context, snapshot) {
                             return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
                               alignment: Alignment.topCenter,
@@ -844,7 +857,7 @@ class _ChatCardState extends State<ChatCard> {
                           elevation: 20.0,
                           child: TextFormField(
                             controller: _messageController,
-                            style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w700),
+                            style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w500),
                             decoration: InputDecoration(
                               labelStyle:TextStyle(fontSize: MediaQuery.of(context).size.width*0.045),
                               labelText: "Type a message",
@@ -853,7 +866,17 @@ class _ChatCardState extends State<ChatCard> {
                                 icon: Icon(Icons.send,size:25.0,color: Colors.black,),
                                 onPressed: (){
                                   Firestore.instance
-                                      .collection("chat_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
+                                      .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
+                                    "message":_messageController.text,
+                                    "accountEmail":loggedInEmail,
+                                    'timestamp': DateTime.now().toIso8601String(),
+                                  }).then((value){
+                                    setState(() {
+                                      _messageController.clear();
+                                    });
+                                  });
+                                  Firestore.instance
+                                      .collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").add({
                                     "message":_messageController.text,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
@@ -891,12 +914,26 @@ void addChat(String userEmail,String chatToEmail,String chatToName,String chatTo
         });
        }
   });
+  Firestore.instance.collection("users").document(userEmail).get().then((doc){
+    if(doc.exists){
+      Firestore.instance.collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").get().then((value){
+        if(!value.exists){
+          Firestore.instance.collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").setData({
+            "name":doc.data['name'],
+            "email":doc.data['email'],
+            "image":doc.data['photoURL'],
+          });
+        }
+      });
+    }
+  });
+
 }
 
 
 class Chat extends StatefulWidget {
   final String message,account;
-  DateTime timestamp;
+  final DateTime timestamp;
   Chat(this.message,this.account,this.timestamp);
   @override
   _ChatState createState() => _ChatState();
@@ -917,7 +954,8 @@ class _ChatState extends State<Chat> {
           child: Container(
             child: Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                borderRadius: widget.account=="peer"?BorderRadius.only(topLeft:Radius.circular(12.0),topRight:Radius.circular(12.0) ,bottomRight: Radius.circular(12.0)):
+                BorderRadius.only(topLeft:Radius.circular(12.0),topRight:Radius.circular(12.0) ,bottomLeft: Radius.circular(12.0)),
               ),
               color: widget.account=="peer"?Colors.grey:Colors.blueAccent,
               child: Padding(

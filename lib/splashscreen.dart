@@ -14,7 +14,7 @@ class AnimatedSplashScreen extends StatefulWidget {
 
 class SplashScreenState extends State<AnimatedSplashScreen>
     with SingleTickerProviderStateMixin {
-  var _visible = true;
+  //var _visible = true;
   // Future<void> _initialVideoPlayer;
   VideoPlayerController _controller;
   Timer timer;

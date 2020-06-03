@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import 'helpAndSupport.dart';
 import 'newLoginscreen2.dart';
 
 class UserProfileUI extends StatefulWidget {
-  String email;
+  final String email;
   UserProfileUI(this.email);
   @override
   _UserProfileUIState createState() => _UserProfileUIState();
@@ -95,10 +96,36 @@ int retGender(AsyncSnapshot snapshot){
                               TopBar(),
                               Positioned(
                                 top: MediaQuery.of(context).size.height*0.15,
-                                child: snapshot.data['photoURL']!=null?CircleAvatar(
-                                    radius: 70,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: NetworkImage(snapshot.data['photoURL'])):Material(shape: CircleBorder(),elevation: 12.0,child: Icon(Icons.account_circle,size: 140.0,color: Colors.blueAccent,)),
+                                child: snapshot.data['photoURL']!=null?
+                                Material(
+                                  shape: CircleBorder(),
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width*0.4,
+                                    height: MediaQuery.of(context).size.width*0.4,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color:Colors.white,width: 3.0),
+                                    ),
+                                    child: CachedNetworkImage(
+                                      imageUrl: snapshot.data['photoURL'],
+                                      fadeInDuration: Duration(milliseconds: 500),
+                                      fadeInCurve: Curves.easeIn,
+                                      imageBuilder: (context, imageProvider) => Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: imageProvider, fit: BoxFit.cover),
+                                        ),
+                                      ),
+                                      placeholder: (context, url) => Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                      errorWidget: (context, url, error) => Icon(Icons.error),
+                                    ),
+                                  ),
+                                )
+                                :Material(shape: CircleBorder(),elevation: 12.0,child: Icon(Icons.account_circle,size: 140.0,color: Colors.blueAccent,)),
                               ),
                               Positioned(
                                 top: MediaQuery.of(context).size.height*0.3,

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'insideHotelPage.dart';
 import 'organiserPageNotifications.dart';
@@ -94,7 +95,7 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
       child: Card(
         elevation: 10.0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
         child: InkWell(
           onTap: () {
@@ -102,7 +103,8 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
                 builder: (BuildContext context) =>
                     HotelDetailsPage(eventName: widget.title,)));
           },
-          child: Column(
+          child: Stack(
+            alignment: Alignment.bottomLeft,
             children: <Widget>[
               CachedNetworkImage(
                 imageUrl: widget.imageUrl,
@@ -112,8 +114,9 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
                   width:350,
                   height: 175,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     image: DecorationImage(
+                      colorFilter: ColorFilter.mode(Colors.black26,BlendMode.darken),
                         image: imageProvider, fit: BoxFit.cover),
                   ),
                 ),
@@ -126,16 +129,19 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
               SizedBox(
                 height: 10.0,
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    widget.title,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
+              Container(
+                width: 200.0,
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      widget.title,
+                      style: GoogleFonts.aBeeZee(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

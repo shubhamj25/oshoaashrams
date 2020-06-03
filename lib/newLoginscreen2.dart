@@ -14,7 +14,7 @@ import 'package:http/http.dart'as http;
 
 
 class NewLoginScreenTwo extends StatefulWidget {
-  String message;
+  final String message;
   NewLoginScreenTwo({this.message});
   @override
   _NewLoginScreenTwoState createState() => _NewLoginScreenTwoState();

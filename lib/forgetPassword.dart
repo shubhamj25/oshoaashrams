@@ -10,9 +10,9 @@ class ForgetPassword extends StatefulWidget {
 }
 
 class _ForgetPasswordState extends State<ForgetPassword> {
-  bool _rememberMe = false;
+  //bool _rememberMe = false;
   final _emailController=TextEditingController();
-  Widget _buildSocialBtn(Function onTap, AssetImage logo) {
+  /* Widget _buildSocialBtn(Function onTap, AssetImage logo) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -34,7 +34,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         ),
       ),
     );
-  }
+  }*/
   final GlobalKey<ScaffoldState> _scaffoldKey=new GlobalKey<ScaffoldState>();
   bool verifying =false;
   @override

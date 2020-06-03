@@ -1,18 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:groovin_widgets/groovin_expansion_tile.dart';
-
-
-import 'insideHotelPage.dart';
 import 'organiserPageNotifications.dart';
 
 
 List<BookingCard>bookings=[];
 
 class BookingPage extends StatefulWidget {
-  String email;
+  final String email;
   BookingPage({this.email});
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -92,7 +88,7 @@ class _BookingPageState extends State<BookingPage> {
 class BookingCard extends StatefulWidget {
   final String bookingId,eventName,userEmail;
   final int total;
-  Timestamp placedOn;
+  final Timestamp placedOn;
   final List<Map<String, dynamic>> persons;
   BookingCard(this.bookingId,this.userEmail,this.eventName,this.total,this.persons,this.placedOn);
   @override
@@ -114,11 +110,11 @@ class _BookingCardState extends State<BookingCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
       child: GroovinExpansionTile(
-        defaultTrailingIconColor: Color.fromRGBO(253, 11, 23, 1),
+        defaultTrailingIconColor: Colors.white,
         initiallyExpanded: false,
         boxDecoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+            color: Colors.blueAccent,
+            borderRadius: BorderRadius.only(topRight: Radius.circular(16.0),bottomLeft: Radius.circular(16.0)),
             boxShadow: [
               BoxShadow(
                   color: Colors.black26,
@@ -131,7 +127,7 @@ class _BookingCardState extends State<BookingCard> {
         backgroundColor: Colors.white,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text("${widget.eventName}", style: TextStyle(color: Colors.red,
+          child: Text("${widget.eventName}", style: TextStyle(color: Colors.white,
               fontWeight: FontWeight.w700,
               fontSize: MediaQuery
                   .of(context)
@@ -248,17 +244,17 @@ class _BookingCardState extends State<BookingCard> {
                 style: TextStyle(fontSize: MediaQuery
                     .of(context)
                     .size
-                    .width * 0.048, color: Colors.blueAccent,fontWeight: FontWeight.w500),),
+                    .width * 0.048, color: Colors.white,fontWeight: FontWeight.w500),),
               Text("Grand Total: Rs ${widget.total}",
                 style: TextStyle(fontSize: MediaQuery
                     .of(context)
                     .size
-                    .width * 0.048, color: Colors.deepPurple,fontWeight: FontWeight.w500),),
+                    .width * 0.048, color: Colors.white,fontWeight: FontWeight.w500),),
               Text("Persons: ${widget.persons.length}",
                 style: TextStyle(fontSize: MediaQuery
                     .of(context)
                     .size
-                    .width * 0.048, fontWeight: FontWeight.w600),),
+                    .width * 0.048,color:Colors.white,fontWeight: FontWeight.w600),),
 
 
             ],

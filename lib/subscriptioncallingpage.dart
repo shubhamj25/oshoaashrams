@@ -3,6 +3,7 @@ import 'package:rooms/subscriptionMainPage.dart';
 
 void main() => runApp(SubscriptionMyApp());
 TextTheme _textTheme = TextTheme(
+  // ignore: deprecated_member_use
   title: TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.bold,

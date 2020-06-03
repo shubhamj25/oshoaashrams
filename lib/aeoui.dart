@@ -416,6 +416,7 @@ class _HomePageState extends State<HomePage> {
     latestOyo = Constants.getLatestOyo();
     yourWallets = Constants.getYourWallet();
   }
+  // ignore: non_constant_identifier_names
   Widget image_carousel;
   @override
   Widget build(BuildContext context) {
@@ -1176,9 +1177,9 @@ class _AeoUIState extends State<AeoUI> {
 
 }
 class CustomListview extends StatelessWidget {
-  IconData icon;
-  String text;
-  Function onTap;
+  final IconData icon;
+  final String text;
+  final Function onTap;
   CustomListview(this.icon, this.text, this.onTap);
 
   @override

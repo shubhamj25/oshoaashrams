@@ -19,14 +19,14 @@ Map<String, dynamic> emailData = {
 };
 
 class NewSinup extends StatefulWidget {
-  String message;
+  final String message;
   NewSinup({this.message});
   @override
   _NewSinupState createState() => _NewSinupState();
 }
 
 class _NewSinupState extends State<NewSinup> {
-  bool _rememberMe = false;
+ // bool _rememberMe = false;
   final _formKey = GlobalKey<FormState>();
   final _emailController=TextEditingController();
   final _passwordController=TextEditingController();
@@ -120,7 +120,7 @@ class _NewSinupState extends State<NewSinup> {
     return _linkMessage;
   }
 
-  Widget _buildSocialBtn(Function onTap, AssetImage logo) {
+  /*Widget _buildSocialBtn(Function onTap, AssetImage logo) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -142,7 +142,7 @@ class _NewSinupState extends State<NewSinup> {
         ),
       ),
     );
-  }
+  }*/
   bool emailerror=false;
   bool passworderror=false;
   int  _selectedGender=0;

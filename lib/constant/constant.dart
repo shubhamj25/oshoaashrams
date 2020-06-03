@@ -8,8 +8,11 @@ import 'package:rooms/model/weekendgetawayslist.dart';
 import 'package:rooms/model/yourwalletslist.dart';
 
 class Constants {
+  // ignore: non_constant_identifier_names
   static final String AEO_UI = 'OYO_UI';
+  // ignore: non_constant_identifier_names
   static final String LOGIN_PAGE = 'LOGIN_PAGE';
+  // ignore: non_constant_identifier_names
   static final String SPLASH_SCREEN = 'SPLASH_SCREEN';
 
   static List<AreaLocationList> getLocationList() {
