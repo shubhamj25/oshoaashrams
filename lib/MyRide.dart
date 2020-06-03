@@ -845,6 +845,14 @@ class _ChatCardState extends State<ChatCard> {
                             return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
                               alignment: Alignment.topCenter,
                               child: Container(
+                                decoration: BoxDecoration(
+                                  image:DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: CachedNetworkImageProvider(
+                                      "https://firebasestorage.googleapis.com/v0/b/osho-b6c37.appspot.com/o/chat.jpg?alt=media&token=2890e2bd-c005-46cc-ac11-2443655ed059",
+                                    ),
+                                    )
+                                ),
                                 height: MediaQuery.of(context).size.height*0.8,
                                 child: ListView.builder(
                                   padding: EdgeInsets.all(10.0),
