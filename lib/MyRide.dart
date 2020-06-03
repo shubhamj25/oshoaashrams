@@ -94,8 +94,12 @@ class _MyRideState extends State<MyRide> {
                               child: CircularProgressIndicator(),
                             ),
                           ):
-                          ListView(
+                          rides.isNotEmpty?ListView(
                             children: rides,
+                          ):Center(
+                            child: Text("No Ride Available",style: GoogleFonts.balooBhaina(
+                                color: Colors.black, fontSize: 20.0),
+                            ),
                           )
                           ;
                         },
@@ -143,8 +147,12 @@ class _MyRideState extends State<MyRide> {
                               child: CircularProgressIndicator(),
                             ),
                           ):
-                          ListView(
+                          currentRides.isNotEmpty?ListView(
                             children: currentRides,
+                          ):Center(
+                            child: Text("No Rides Booked",style: GoogleFonts.balooBhaina(
+                                color: Colors.black, fontSize: 20.0),
+                            ),
                           )
                           ;
                         },
@@ -177,18 +185,42 @@ class _MyRideState extends State<MyRide> {
                                 snapshot.data.documents.elementAt(i).data['gender']));
                           }
                         }
-                        return !snapshot.hasData?Center(child: CircularProgressIndicator())
-                        :ListView(
+                        return !snapshot.hasData?Center(child: CircularProgressIndicator()):
+                        requests.isNotEmpty?ListView(
                           shrinkWrap: true,
                           children: requests,
-                        );
+                        ):Center(
+                          child: Text("No Ride Requests",style: GoogleFonts.balooBhaina(
+                              color: Colors.black, fontSize: 20.0),
+                          ),
+                        )
+                        ;
                       },
                     ),
                   ),
                   //Chats
                   Scaffold(
-                    body:ListView(
-                      children:chats,
+                    body:StreamBuilder<QuerySnapshot>(
+                      stream: Firestore.instance.collection("chats_$loggedInEmail").snapshots(),
+                      builder: (context, snapshot) {
+                        return !snapshot.hasData?Center(child: CircularProgressIndicator()):
+                        ListView.builder(
+                          itemCount: snapshot.data.documents.length,
+                          itemBuilder: (context,i){
+                            if(snapshot.data.documents.elementAt(0).documentID.contains("info")){
+                              return ChatCard(loggedInEmail,snapshot.data.documents.elementAt(i).data['email'],
+                                  snapshot.data.documents.elementAt(i).data['image'],snapshot.data.documents.elementAt(i).data['name']);
+                            }
+                            else{
+                              return Center(
+                                child: Text("No Active Chats",style: GoogleFonts.balooBhaina(
+                                    color: Colors.black, fontSize: 20.0),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      }
                     ),
                   )
                 ],
@@ -507,6 +539,7 @@ class CurrentRideCard extends StatefulWidget {
 
 class _CurrentRideCardState extends State<CurrentRideCard> {
   bool isActive=true;
+  bool inTouch=false;
   BorderRadius contentBorder=BorderRadius.all(Radius.circular(0));
   @override
   void initState() {
@@ -519,6 +552,16 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
         }
         else{
           isActive=false;
+        }
+      });
+    });
+    Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.userEmail}_info").get().then((doc){
+      setState(() {
+        if(doc.exists){
+          inTouch=true;
+        }
+        else{
+          inTouch=false;
         }
       });
     });
@@ -579,16 +622,48 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text("Message",style:TextStyle(color: Colors.blueAccent,fontSize: 16,fontWeight: FontWeight.w600)),
+                              Text(inTouch?"In Touch":"Message",style:TextStyle(color: Colors.blueAccent,fontSize: 16,fontWeight: FontWeight.w600)),
                               Padding(
                                 padding: const EdgeInsets.all(5.0),
-                                child: Icon(Icons.send,color: Colors.blueAccent),
+                                child: Icon(inTouch?Icons.touch_app:Icons.send,color: Colors.blueAccent),
                               ),
                             ],
                           ),
                           color: Colors.white,
                           onPressed:(){
-                            addChat(loggedInEmail,widget.userEmail, widget.userName, widget.img);
+                            if(inTouch==false){
+                              addChat(loggedInEmail,widget.userEmail, widget.userName, widget.img);
+                              Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.blueAccent,
+                                    content: Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal:8.0),
+                                          child: Icon(Icons.info,color: Colors.white,size: 35,),
+                                        ),
+                                        Expanded(child: Text("You have a new Chat !\nPlease check your chat list",style: TextStyle(fontSize: 16.0,color: Colors.white),))
+                                      ],
+                                    ),
+                                  )
+                              );
+                            }
+                            else{
+                              Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.blueAccent,
+                                    content: Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal:8.0),
+                                          child: Icon(Icons.info,color: Colors.white,size: 35,),
+                                        ),
+                                        Expanded(child: Text("Already in Touch!\nPlease check your chat list",style: TextStyle(fontSize: 16.0,color: Colors.white),))
+                                      ],
+                                    ),
+                                  )
+                              );
+                            }
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all((Radius.circular(8.0))),
@@ -718,13 +793,19 @@ class _ChatCardState extends State<ChatCard> {
           ),
           title: Text(widget.chatToName,style: TextStyle(fontSize: 18.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
           subtitle: Text("Osho Customer",style: TextStyle(fontSize: 16.0,fontWeight: FontWeight.w500)),
-          trailing: Icon(Icons.add_comment,color: Colors.black,),
+          trailing: IconButton(icon: Icon(Icons.delete,color: deepRed,),
+          onPressed: (){
+            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
+            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
+          },
+          ),
           onTap: (){
             Navigator.push(context, MaterialPageRoute(
               builder: (context){
                 return Scaffold(
                   appBar: AppBar(
-                    title: Text("Chat"),
+                    title: Text(widget.chatToName),
+                    backgroundColor: deepRed,
                     leading: IconButton(
                       icon: Icon(Icons.close),
                       onPressed: ()=>Navigator.pop(context),
@@ -735,7 +816,7 @@ class _ChatCardState extends State<ChatCard> {
                       children: <Widget>[
                         StreamBuilder<QuerySnapshot>(
                           stream: Firestore.instance
-                              .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
+                              .collection("chat_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
                           builder: (context, snapshot) {
                             return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
                               alignment: Alignment.topCenter,
@@ -745,10 +826,10 @@ class _ChatCardState extends State<ChatCard> {
                                   padding: EdgeInsets.all(10.0),
                                   itemBuilder: (context, index){
                                     if(snapshot.data.documents.elementAt(index).data['accountEmail']!=loggedInEmail) {
-                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","peer");
+                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","peer",DateTime.parse(snapshot.data.documents.elementAt(index).data['timestamp']));
                                     }
                                     else{
-                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","current");
+                                      return Chat("${snapshot.data.documents.elementAt(index).data['message']}","current",DateTime.parse(snapshot.data.documents.elementAt(index).data['timestamp']));
                                     }
                                   },
                                   itemCount: snapshot.data.documents.length,
@@ -760,6 +841,7 @@ class _ChatCardState extends State<ChatCard> {
                           },
                         ),
                         Material(
+                          elevation: 20.0,
                           child: TextFormField(
                             controller: _messageController,
                             style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w700),
@@ -771,10 +853,14 @@ class _ChatCardState extends State<ChatCard> {
                                 icon: Icon(Icons.send,size:25.0,color: Colors.black,),
                                 onPressed: (){
                                   Firestore.instance
-                                      .collection("chat_${loggedInEmail}with${widget.chatToEmail}").document("messages").collection("chat").add({
+                                      .collection("chat_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
                                     "message":_messageController.text,
                                     "accountEmail":loggedInEmail,
-                                    'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+                                    'timestamp': DateTime.now().toIso8601String(),
+                                  }).then((value){
+                                    setState(() {
+                                      _messageController.clear();
+                                    });
                                   });
                                 },
                               ),
@@ -796,10 +882,9 @@ class _ChatCardState extends State<ChatCard> {
 }
 
 void addChat(String userEmail,String chatToEmail,String chatToName,String chatToImage){
-  chats.add(ChatCard(userEmail, chatToEmail, chatToImage, chatToName));
-  Firestore.instance.collection("chat_${loggedInEmail}with$chatToEmail").document(chatToEmail).get().then((value){
+  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").get().then((value){
     if(!value.exists){
-      Firestore.instance.collection("chat_${loggedInEmail}with$chatToEmail").document(chatToEmail).setData({
+      Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").setData({
         "name":chatToName,
         "email":chatToEmail,
         "image":chatToImage,
@@ -811,7 +896,8 @@ void addChat(String userEmail,String chatToEmail,String chatToName,String chatTo
 
 class Chat extends StatefulWidget {
   final String message,account;
-  Chat(this.message,this.account);
+  DateTime timestamp;
+  Chat(this.message,this.account,this.timestamp);
   @override
   _ChatState createState() => _ChatState();
 }
@@ -823,20 +909,76 @@ class _ChatState extends State<Chat> {
       padding: const EdgeInsets.symmetric(horizontal:8.0),
       child: Container(
         alignment: widget.account=="peer"?Alignment.topLeft:Alignment.topRight,
-        child: Container(
-          width: MediaQuery.of(context).size.width*0.6,
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            ),
-            color: widget.account=="peer"?Colors.grey:Colors.blueAccent,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(widget.message,style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.w500,color: Colors.white),),
+
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width*0.65,
+          ),
+          child: Container(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              ),
+              color: widget.account=="peer"?Colors.grey:Colors.blueAccent,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(widget.message,style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.w500,color: Colors.white),),
+                    Padding(
+                      padding: const EdgeInsets.only(top:2.0),
+                      child: Text("${widget.timestamp.day} ${month(widget.timestamp.month)}@${widget.timestamp.hour}:${widget.timestamp.minute} hrs",textAlign: TextAlign.right,style: TextStyle(color: Colors.white,fontSize: 10.0),),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+String month(int x){
+  if(x==1){
+    return "January";
+  }
+  else if(x==2){
+    return "February";
+  }
+  else if(x==3){
+    return "March";
+  }
+  else if(x==4){
+    return "April";
+  }
+  else if(x==5){
+    return "May";
+  }
+  else if(x==6){
+    return "June";
+  }
+  else if(x==7){
+    return "July";
+  }
+  else if(x==8){
+    return "August";
+  }
+  else if(x==9){
+    return "September";
+  }
+  else if(x==10){
+    return "October";
+  }
+  else if(x==12){
+    return "November";
+  }
+  else if(x==12){
+    return "December";
+  }
+  else{
+    return "Wrong Month";
   }
 }
