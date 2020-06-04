@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:rooms/MyRide.dart';
 import 'package:rooms/aeoui.dart';
 
 List<Map<String,dynamic>> firebaseBooking=[];
@@ -15,14 +20,156 @@ class BookEvent extends StatefulWidget {
 }
 
 class _BookEventState extends State<BookEvent> {
+  final GlobalKey<ScaffoldState> _scaffoldKey=new GlobalKey<ScaffoldState>();
   bool adding=false;
+  Razorpay _razorPay;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    persons.clear();
     firebaseBooking.clear();
+    _razorPay=Razorpay();
+    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,_handlePaymentSuccess);
+    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,_handlePaymentError);
+    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET,_handleExternalWallet);
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _razorPay.clear();
+  }
+
+  void openCheckout() async {
+    var options;
+    Firestore.instance.collection("users").document(widget.userEmail).get().then((doc){
+      setState(() {
+        options = {
+          'key': 'rzp_test_BEjEEhCpmE41rI',
+          'amount': widget.eventPrice*persons.length*100,
+          'name': 'Osho Aaashrams',
+          'description': '${widget.eventName} booking request by ${widget.userEmail}',
+          'prefill': {'contact': doc.data['phone'], 'email': widget.userEmail},
+          'external': {
+            'wallets': ['paytm']
+          }
+        };
+        try {
+          _razorPay.open(options);
+        } catch (e) {
+          debugPrint(e);
+        }
+      });
+    });
+
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+
+    SafeArea(
+      child: Flushbar(
+        shouldIconPulse: true,
+        isDismissible: true,
+        flushbarPosition: FlushbarPosition.TOP,
+        titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+        messageText: Text("Booking Confirmed with id ${response.paymentId}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+        duration: Duration(seconds: 1),
+        icon: Icon(Icons.check,color: Colors.white,),
+        backgroundColor:  Colors.green,
+      )..show(context).then((value){
+        Firestore.instance.collection("${widget.userEmail}_bookings").add(
+            {
+              "eventName":widget.eventName,
+              "email":widget.userEmail,
+              "totalPrice":persons.length*widget.eventPrice,
+              "bookedAt":Timestamp.now(),
+              "personDetails":firebaseBooking,
+            }
+        ).then((value){
+          Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+            "bookingId":value.documentID,
+          });
+          Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+            for (DocumentSnapshot ds in snapshot.documents){
+              ds.reference.delete();
+            }});
+          setState(() {
+            adding=false;
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                builder: (context){
+                  return AeoUI(username: widget.userEmail,);
+                }
+            ), (route) => false);
+          });
+        });
+      }),
+    );
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    SafeArea(
+      child: Flushbar(
+        shouldIconPulse: true,
+        isDismissible: true,
+        flushbarPosition: FlushbarPosition.TOP,
+        titleText: Text("Payment Failed",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+        messageText: Text("${response.message}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+        duration: Duration(seconds: 1),
+        icon: Icon(Icons.close,color: Colors.white,),
+        backgroundColor:  Colors.red,
+      )..show(context).then((value){
+        Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+          for (DocumentSnapshot ds in snapshot.documents){
+            ds.reference.delete();
+          }});
+        Navigator.pop(context);
+      }),
+    );
+  }
+
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    SafeArea(
+      child: Flushbar(
+        flushbarPosition: FlushbarPosition.TOP,
+        shouldIconPulse: true,
+        isDismissible: true,
+        titleText: Text("Payment Failed",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+        messageText: Text("Payment Made using ${response.walletName}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+        duration: Duration(seconds: 1),
+        icon: Icon(Icons.close,color: Colors.white,),
+        backgroundColor:  Colors.red,
+      )..show(context).then((value){
+        Firestore.instance.collection("${widget.userEmail}_bookings").add(
+            {
+              "eventName":widget.eventName,
+              "email":widget.userEmail,
+              "totalPrice":persons.length*widget.eventPrice,
+              "bookedAt":Timestamp.now(),
+              "personDetails":firebaseBooking,
+            }
+        ).then((value){
+          Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+            "bookingId":value.documentID,
+          });
+          Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+            for (DocumentSnapshot ds in snapshot.documents){
+              ds.reference.delete();
+            }});
+          setState(() {
+            adding=false;
+            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                builder: (context){
+                  return AeoUI(username: widget.userEmail,);
+                }
+            ), (route) => false);
+          });
+        });
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -138,19 +285,22 @@ class _BookEventState extends State<BookEvent> {
                                 stream: Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").snapshots(),
                                 builder: (context,snapshot){
                                   persons.clear();
+                                  firebaseBooking.clear();
                                   Firestore.instance.collection("users").document(widget.userEmail.toString()).get().then((doc){
                                     if(doc.exists){
                                       Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").document(doc.data['name'].toString()).setData({
                                         "name":doc.data['name'],
                                         "email":doc.data['email'],
                                         "gender":doc.data['gender'],
-                                        "age":doc.data['age']
+                                        "age":doc.data['age'],
+                                        "eventName":widget.eventName,
                                       });
                                     }
                                   });
                                   if(snapshot.hasData){
                                     for(int i=0;i<snapshot.data.documents.length;i++){
-                                      persons.add(PersonCard(snapshot.data.documents.elementAt(i).data['name'], snapshot.data.documents.elementAt(i).data['email'], snapshot.data.documents.elementAt(i).data['age'], snapshot.data.documents.elementAt(i).data['gender']));
+                                      persons.add(PersonCard(snapshot.data.documents.elementAt(i).data['name'], snapshot.data.documents.elementAt(i).data['email'], snapshot.data.documents.elementAt(i).data['age'], snapshot.data.documents.elementAt(i).data['gender'],snapshot.data.documents.elementAt(i).data['eventName']));
+                                      firebaseBooking.add({"name":snapshot.data.documents.elementAt(i).data['name'],"email": snapshot.data.documents.elementAt(i).data['email'],"age": snapshot.data.documents.elementAt(i).data['age'],"gender": snapshot.data.documents.elementAt(i).data['gender'],"eventName":snapshot.data.documents.elementAt(i).data['eventName']});
                                     }
                                   }
                                   return snapshot.hasData?Column(
@@ -177,32 +327,8 @@ class _BookEventState extends State<BookEvent> {
                   setState(() {
                     adding=true;
                   });
-                   Firestore.instance.collection("${widget.userEmail}_bookings").add(
-                     {
-                       "eventName":widget.eventName,
-                       "email":widget.userEmail,
-                       "totalPrice":persons.length*widget.eventPrice,
-                       "bookedAt":Timestamp.now(),
-                       "personDetails":firebaseBooking,
-                     }
-                   ).then((value){
-                     Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
-                       "bookingId":value.documentID,
-                     });
-                     Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
-                       for (DocumentSnapshot ds in snapshot.documents){
-                         ds.reference.delete();
-                       }});
-                     setState(() {
-                       adding=false;
-                       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                           builder: (context){
-                             return AeoUI(username: widget.userEmail,);
-                           }
-                       ), (route) => false);
-                     });
-                   });
-                },
+                  openCheckout();
+                 },
               ),
             ),
           ],
@@ -214,8 +340,8 @@ class _BookEventState extends State<BookEvent> {
 
 
 class PersonCard extends StatefulWidget {
-  final String name,email,gender,age;
-  PersonCard(this.name,this.email,this.age,this.gender);
+  final String name,email,gender,age,eventName;
+  PersonCard(this.name,this.email,this.age,this.gender, this.eventName);
   @override
   _PersonCardState createState() => _PersonCardState();
 }
@@ -229,7 +355,8 @@ class _PersonCardState extends State<PersonCard> {
       "name":widget.name,
       "email":widget.email,
       "gender":widget.gender,
-      "age":widget.age
+      "age":widget.age,
+      "eventCode":widget.eventName,
     });
   }
   @override
@@ -257,8 +384,17 @@ class _PersonCardState extends State<PersonCard> {
               ),
              IconButton(icon:Icon(Icons.delete,color: Colors.red,size: 25.0,),
              onPressed: (){
-
-             },
+              Firestore.instance.collection("${loggedInEmail}_${widget.eventName}_persons").document(widget.name).delete().then((value){
+                persons.remove(PersonCard(widget.name,widget.email,widget.age, widget.gender, widget.eventName));
+                firebaseBooking.remove({
+                  "name":widget.name,
+                  "email":widget.email,
+                  "gender":widget.gender,
+                  "age":widget.age,
+                  "eventCode":widget.eventName,
+                });
+              });
+                },
              )
             ],
           ),
@@ -327,9 +463,6 @@ class _PersonCardState extends State<PersonCard> {
     );
   }
 }
-
-
-
 
 
 class AddPersonCard extends StatefulWidget {
@@ -611,11 +744,12 @@ class _AddPersonCardState extends State<AddPersonCard> {
                     color:  Color.fromRGBO(253, 11, 23, 1),
                     onPressed: (){
                       if(_formKey.currentState.validate()){
-                        Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").document(nameController.text.toString()).setData({
+                        Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").document(nameController.text.toString().trim()).setData({
                           "name":nameController.text,
                           "email":emailController.text.trim(),
                           "gender":gender,
-                          "age":ageController.text.trim()
+                          "age":ageController.text.trim(),
+                          "eventName":widget.eventName,
                         });
                         Navigator.pop(context);
                       }

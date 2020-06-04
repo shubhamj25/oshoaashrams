@@ -196,19 +196,19 @@ int retGender(AsyncSnapshot snapshot){
                         title: Center(
                             child: Text(
                               "${snapshot.data['name']}",
-                              style: GoogleFonts.balooBhaina(
-                                  fontSize: 18.0,
+                              style: GoogleFonts.aBeeZee(
+                                  fontSize: 20.0,
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
                             )),
-                        subtitle: Center(child: Text("Osho Customer")),
+                        subtitle: Center(child: Text("Osho Customer",style:GoogleFonts.balooBhaina(
+                          fontSize: 18.0,
+                          ),
+                          )),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-//                SizedBox(
-//                  width: 10.0,
-//                ),
                           FlatButton.icon(
                             color: Color.fromRGBO(253, 11, 23, 1),
                             onPressed: () {

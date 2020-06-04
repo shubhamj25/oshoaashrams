@@ -57,7 +57,7 @@ class _BookingPageState extends State<BookingPage> {
             ),
 
             StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance.collection("${widget.email}_bookings").snapshots(),
+              stream: Firestore.instance.collection("${widget.email}_bookings").orderBy('bookedAt',descending: true).snapshots(),
               builder: (context,snapshot){
                 bookings.clear();
                 if(snapshot.hasData){

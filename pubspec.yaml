@@ -44,6 +44,8 @@ dependencies:
   cloud_functions:
   shared_preferences:
   flutter_advanced_networkimage: ^0.7.0
+  razorpay_flutter:
+  flushbar:
   image_cropper:
   image_picker:
   toggle_switch:
