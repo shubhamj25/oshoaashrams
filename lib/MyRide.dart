@@ -994,6 +994,7 @@ class _ChatCardState extends State<ChatCard> {
                       onPressed: ()=>Navigator.pop(context),
                     ),
                   ),
+
                   body: SingleChildScrollView(
                     child: Column(
                       children: <Widget>[
