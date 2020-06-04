@@ -19,6 +19,10 @@ class MyRide extends StatefulWidget {
 }
 
 class _MyRideState extends State<MyRide> {
+  final searchController=TextEditingController();
+  final contactSearchController=TextEditingController();
+  String contact="";
+  String destination="";
   @override
   void initState() {
     // TODO: implement initState
@@ -66,43 +70,76 @@ class _MyRideState extends State<MyRide> {
                   //search
                   Scaffold(
                     body: Container(
-                      height: MediaQuery.of(context).size.height,
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: Firestore.instance.collection("rides").snapshots(),
-                        builder: (context,snapshot){
-                          rides.clear();
-                          if(snapshot.hasData){
-                            for(int i=0;i<snapshot.data.documents.length;i++){
-                              if(!List.from(snapshot.data.documents.elementAt(i).data['persons']).contains(loggedInEmail)){
-                                rides.add(RideCard(
-                                    snapshot.data.documents.elementAt(i).data['image'],
-                                    snapshot.data.documents.elementAt(i).data['email'],
-                                    snapshot.data.documents.elementAt(i).data['name'],
-                                    snapshot.data.documents.elementAt(i).data['age'],
-                                    snapshot.data.documents.elementAt(i).data['travellingTo'],
-                                    snapshot.data.documents.elementAt(i).data['travellingFrom'],
-                                    snapshot.data.documents.elementAt(i).data['start'],
-                                    snapshot.data.documents.elementAt(i).data['end'],
-                                    snapshot.data.documents.elementAt(i).data['gender']
-                                ));
-                              }
-                            }
-                          }
-                          return !snapshot.hasData?Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32.0),
-                              child: CircularProgressIndicator(),
+                      height: MediaQuery.of(context).size.height*0.8,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Material(
+                              child: TextFormField(
+                                controller: searchController,
+                                style: GoogleFonts.aBeeZee(color:Colors.black,fontSize:18.0),
+                                onChanged: (String value){
+                                  setState(() {
+                                    destination=value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  hintText: "Search Destination...",
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 32.0,vertical: 14.0),
+                                  suffixIcon: InkWell(
+                                    child: Icon(Icons.search,color: Colors.black,),
+                                    onTap: ()=>null,
+                                  ),
+                                  border: InputBorder.none,
+                                ),
+                              ),
                             ),
-                          ):
-                          rides.isNotEmpty?ListView(
-                            children: rides,
-                          ):Center(
-                            child: Text("No Ride Available",style: GoogleFonts.balooBhaina(
-                                color: Colors.black, fontSize: 20.0),
+                            StreamBuilder<QuerySnapshot>(
+                              stream: Firestore.instance.collection("rides").snapshots(),
+                              builder: (context,snapshot){
+                                rides.clear();
+                                if(snapshot.hasData){
+                                  for(int i=0;i<snapshot.data.documents.length;i++){
+                                    if(!List.from(snapshot.data.documents.elementAt(i).data['persons']).contains(loggedInEmail)&&
+                                        (snapshot.data.documents.elementAt(i).data['travellingTo'].toString().contains(destination)||snapshot.data.documents.elementAt(i).data['travellingTo'].toString().toUpperCase().contains(destination)||snapshot.data.documents.elementAt(i).data['travellingTo'].toString().toLowerCase().contains(destination))
+                                    ){
+                                      rides.add(RideCard(
+                                          snapshot.data.documents.elementAt(i).data['image'],
+                                          snapshot.data.documents.elementAt(i).data['email'],
+                                          snapshot.data.documents.elementAt(i).data['name'],
+                                          snapshot.data.documents.elementAt(i).data['age'],
+                                          snapshot.data.documents.elementAt(i).data['travellingTo'],
+                                          snapshot.data.documents.elementAt(i).data['travellingFrom'],
+                                          snapshot.data.documents.elementAt(i).data['start'],
+                                          snapshot.data.documents.elementAt(i).data['end'],
+                                          snapshot.data.documents.elementAt(i).data['gender'],
+                                          snapshot.data.documents.elementAt(i).data['modeOfTravel'],
+                                      ));
+                                    }
+                                  }
+                                }
+                                return !snapshot.hasData?Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ):
+                                rides.isNotEmpty?Column(
+                                  children: rides,
+                                ):Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: Text("No Ride Available",style: GoogleFonts.balooBhaina(
+                                        color: Colors.black, fontSize: 20.0),
+                                    ),
+                                  ),
+                                )
+                                ;
+                              },
                             ),
-                          )
-                          ;
-                        },
+                          ],
+                        ),
                       ),
                     ),
                     floatingActionButton:
@@ -119,43 +156,53 @@ class _MyRideState extends State<MyRide> {
                   //Current Rides
                   Scaffold(
                     body: Container(
-                      height: MediaQuery.of(context).size.height,
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: Firestore.instance.collection("rides").snapshots(),
-                        builder: (context,snapshot){
-                          currentRides.clear();
-                          if(snapshot.hasData){
-                            for(int i=0;i<snapshot.data.documents.length;i++){
-                              if(List.from(snapshot.data.documents.elementAt(i).data['persons']).contains(loggedInEmail)){
-                                currentRides.add(CurrentRideCard(
-                                    snapshot.data.documents.elementAt(i).data['image'],
-                                    snapshot.data.documents.elementAt(i).data['email'],
-                                    snapshot.data.documents.elementAt(i).data['name'],
-                                    snapshot.data.documents.elementAt(i).data['age'],
-                                    snapshot.data.documents.elementAt(i).data['travellingTo'],
-                                    snapshot.data.documents.elementAt(i).data['travellingFrom'],
-                                    snapshot.data.documents.elementAt(i).data['start'],
-                                    snapshot.data.documents.elementAt(i).data['end'],
-                                    snapshot.data.documents.elementAt(i).data['gender']
-                                ));
-                              }
-                            }
-                          }
-                          return !snapshot.hasData?Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32.0),
-                              child: CircularProgressIndicator(),
+                      height: MediaQuery.of(context).size.height*0.8,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: Firestore.instance.collection("rides").snapshots(),
+                              builder: (context,snapshot){
+                                currentRides.clear();
+                                if(snapshot.hasData){
+                                  for(int i=0;i<snapshot.data.documents.length;i++){
+                                    if(List.from(snapshot.data.documents.elementAt(i).data['persons']).contains(loggedInEmail)){
+                                      currentRides.add(CurrentRideCard(
+                                          snapshot.data.documents.elementAt(i).data['image'],
+                                          snapshot.data.documents.elementAt(i).data['email'],
+                                          snapshot.data.documents.elementAt(i).data['name'],
+                                          snapshot.data.documents.elementAt(i).data['age'],
+                                          snapshot.data.documents.elementAt(i).data['travellingTo'],
+                                          snapshot.data.documents.elementAt(i).data['travellingFrom'],
+                                          snapshot.data.documents.elementAt(i).data['start'],
+                                          snapshot.data.documents.elementAt(i).data['end'],
+                                          snapshot.data.documents.elementAt(i).data['gender'],
+                                          snapshot.data.documents.elementAt(i).data['modeOfTravel']
+                                      ));
+                                    }
+                                  }
+                                }
+                                return !snapshot.hasData?Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ):
+                                currentRides.isNotEmpty?Column(
+                                  children: currentRides,
+                                ):Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: Text("No Rides Booked",style: GoogleFonts.balooBhaina(
+                                        color: Colors.black, fontSize: 20.0),
+                                    ),
+                                  ),
+                                )
+                                ;
+                              },
                             ),
-                          ):
-                          currentRides.isNotEmpty?ListView(
-                            children: currentRides,
-                          ):Center(
-                            child: Text("No Rides Booked",style: GoogleFonts.balooBhaina(
-                                color: Colors.black, fontSize: 20.0),
-                            ),
-                          )
-                          ;
-                        },
+                          ],
+                        ),
                       ),
                     ),
                     floatingActionButton:
@@ -171,58 +218,106 @@ class _MyRideState extends State<MyRide> {
                   ),
                   //Requests
                   Scaffold(
-                    body: StreamBuilder<QuerySnapshot>(
-                      stream: Firestore.instance.collection("rideReq_$loggedInEmail").snapshots(),
-                      builder: (context,snapshot){
-                        requests.clear();
-                        if(snapshot.hasData){
-                          for(int i=0;i<snapshot.data.documents.length;i++){
-                            requests.add(RequestCard(
-                                snapshot.data.documents.elementAt(i).data['image'],
-                                snapshot.data.documents.elementAt(i).data['name'],
-                                snapshot.data.documents.elementAt(i).data['fromEmail'],
-                                snapshot.data.documents.elementAt(i).data['age'],
-                                snapshot.data.documents.elementAt(i).data['gender'],
-                                snapshot.data.documents.elementAt(i).data['rideBy'],
-                            ));
-                          }
-                        }
-                        return !snapshot.hasData?Center(child: CircularProgressIndicator()):
-                        requests.isNotEmpty?ListView(
-                          shrinkWrap: true,
-                          children: requests,
-                        ):Center(
-                          child: Text("No Ride Requests",style: GoogleFonts.balooBhaina(
-                              color: Colors.black, fontSize: 20.0),
-                          ),
-                        )
-                        ;
-                      },
+                    body: Container(
+                      height: MediaQuery.of(context).size.height*0.8,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            StreamBuilder<QuerySnapshot>(
+                              stream: Firestore.instance.collection("rideReq_$loggedInEmail").snapshots(),
+                              builder: (context,snapshot){
+                                requests.clear();
+                                if(snapshot.hasData){
+                                  for(int i=0;i<snapshot.data.documents.length;i++){
+                                    requests.add(RequestCard(
+                                        snapshot.data.documents.elementAt(i).data['image'],
+                                        snapshot.data.documents.elementAt(i).data['name'],
+                                        snapshot.data.documents.elementAt(i).data['fromEmail'],
+                                        snapshot.data.documents.elementAt(i).data['age'],
+                                        snapshot.data.documents.elementAt(i).data['gender'],
+                                        snapshot.data.documents.elementAt(i).data['rideBy'],
+                                    ));
+                                  }
+                                }
+                                return !snapshot.hasData?Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ):
+                                requests.isNotEmpty?Column(
+                                  children: requests,
+                                ):Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(100.0),
+                                    child: Text("No Ride Requests",style: GoogleFonts.balooBhaina(
+                                        color: Colors.black, fontSize: 20.0),
+                                    ),
+                                  ),
+                                )
+                                ;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   //Chats
                   Scaffold(
-                    body:StreamBuilder<QuerySnapshot>(
-                      stream: Firestore.instance.collection("chats_$loggedInEmail").snapshots(),
-                      builder: (context, snapshot) {
-                        return !snapshot.hasData?Center(child: CircularProgressIndicator()):
-                        ListView.builder(
-                          itemCount: snapshot.data.documents.length,
-                          itemBuilder: (context,i){
-                            if(snapshot.data.documents.elementAt(i).documentID.contains("info")){
-                              return ChatCard(loggedInEmail,snapshot.data.documents.elementAt(i).data['email'],
-                                  snapshot.data.documents.elementAt(i).data['image'],snapshot.data.documents.elementAt(i).data['name']);
-                            }
-                            else{
-                              return Center(
-                                child: Text("No Active Chats",style: GoogleFonts.balooBhaina(
-                                    color: Colors.black, fontSize: 20.0),
+                    body:Container(
+                      height: MediaQuery.of(context).size.height*0.8,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              height: MediaQuery.of(context).size.height*0.08,
+                              child: Material(
+                                child: TextFormField(
+                                  controller: searchController,
+                                  enableInteractiveSelection: true,
+                                  onChanged: (String value){
+                                    setState(() {
+                                      contact=value;
+                                    });
+                                  },
+                                  style: GoogleFonts.aBeeZee(color:Colors.black,fontSize:18.0),
+                                  decoration: InputDecoration(
+                                    hintText: "Search Contact...",
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 32.0,vertical: 14.0),
+                                    suffixIcon: InkWell(
+                                      child: Icon(Icons.search,color: Colors.black,),
+                                      onTap: ()=>null,
+                                    ),
+                                    border: InputBorder.none,
+                                  ),
                                 ),
-                              );
-                            }
-                          },
-                        );
-                      }
+                              ),
+                            ),
+                            Container(
+                              height: MediaQuery.of(context).size.height*0.8,
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: Firestore.instance.collection("chats_$loggedInEmail").snapshots(),
+                                builder: (context, snapshot) {
+                                  return !snapshot.hasData?Center(child: CircularProgressIndicator()):
+                                  ListView.builder(
+                                    itemCount: snapshot.data.documents.length,
+                                    itemBuilder: (context,i){
+                                      if(snapshot.data.documents.elementAt(i).documentID.contains("info")&&(snapshot.data.documents.elementAt(i).data['name'].toString().contains(contact)||snapshot.data.documents.elementAt(i).data['name'].toString().toLowerCase().contains(contact)||snapshot.data.documents.elementAt(i).data['name'].toString().toUpperCase().contains(contact))){
+                                        return ChatCard(loggedInEmail,snapshot.data.documents.elementAt(i).data['email'],
+                                            snapshot.data.documents.elementAt(i).data['image'],snapshot.data.documents.elementAt(i).data['name'],snapshot.data.documents.elementAt(i).data['mode']);
+                                      }
+                                      else{
+                                        return Container();
+                                      }
+                                    },
+                                  );
+                                }
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   )
                 ],
@@ -234,8 +329,8 @@ class _MyRideState extends State<MyRide> {
 }
 
 class RideCard extends StatefulWidget {
-  final String userEmail,userName,img,travellingTo,travellingFrom,start,end,gender,age;
-  RideCard(this.img,this.userEmail,this.userName,this.age,this.travellingTo,this.travellingFrom,this.start,this.end,this.gender);
+  final String userEmail,userName,img,travellingTo,travellingFrom,start,end,gender,age,mode;
+  RideCard(this.img,this.userEmail,this.userName,this.age,this.travellingTo,this.travellingFrom,this.start,this.end,this.gender, this.mode);
   @override
   _RideCardState createState() => _RideCardState();
 }
@@ -377,7 +472,7 @@ class _RideCardState extends State<RideCard> {
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
                      title: Text(widget.userName,style: GoogleFonts.aBeeZee(fontSize: 19.0,fontWeight: FontWeight.w600),),
-                    subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo}"
+                    subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo} by ${widget.mode}"
                         " on ${widget.start}.${widget.gender=="Male"?'He':'She'} is ${widget.age} years old and would be staying at ${widget.travellingTo} till ${widget.end}."
                     ,style: GoogleFonts.aBeeZee(
                      fontSize: 17.0,fontWeight: FontWeight.w500,
@@ -530,8 +625,8 @@ class _RequestCardState extends State<RequestCard> {
 
 
 class CurrentRideCard extends StatefulWidget {
-  final String userEmail,userName,img,travellingTo,travellingFrom,start,end,gender,age;
-  CurrentRideCard(this.img,this.userEmail,this.userName,this.age,this.travellingTo,this.travellingFrom,this.start,this.end,this.gender);
+  final String userEmail,userName,img,travellingTo,travellingFrom,start,end,gender,age,mode;
+  CurrentRideCard(this.img,this.userEmail,this.userName,this.age,this.travellingTo,this.travellingFrom,this.start,this.end,this.gender, this.mode);
   @override
   _CurrentRideCardState createState() => _CurrentRideCardState();
 }
@@ -646,7 +741,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                           color: Colors.white,
                           onPressed:(){
                             if(inTouch==false){
-                              addChat(loggedInEmail,widget.userEmail, widget.userName, widget.img);
+                              addChat(loggedInEmail,widget.userEmail, widget.userName, widget.img,widget.mode);
                               Scaffold.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: Colors.blueAccent,
@@ -729,7 +824,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
                         title: Text(widget.userName,style: GoogleFonts.aBeeZee(fontSize: 19.0,fontWeight: FontWeight.w600),),
-                        subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo}"
+                        subtitle: Text("${widget.userName} is travelling from ${widget.travellingFrom} to ${widget.travellingTo} by ${widget.mode}"
                             " on ${widget.start}.${widget.gender=="Male"?'He':'She'} is ${widget.age} years old and would be staying at ${widget.travellingTo} till ${widget.end}."
                           ,style: GoogleFonts.aBeeZee(
                             fontSize: 17.0,
@@ -773,14 +868,40 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
 
 
 class ChatCard extends StatefulWidget {
-  final String userEmail,chatToEmail,chatToName,chatToImage;
-  ChatCard(this.userEmail,this.chatToEmail,this.chatToImage,this.chatToName);
+  final String userEmail,chatToEmail,chatToName,chatToImage,modeOfTravel;
+  ChatCard(this.userEmail,this.chatToEmail,this.chatToImage,this.chatToName, this.modeOfTravel);
   @override
   _ChatCardState createState() => _ChatCardState();
 }
 
 class _ChatCardState extends State<ChatCard> {
   final _messageController=TextEditingController();
+  Icon travelMode;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(widget.modeOfTravel=="Car"){
+      setState(() {
+        travelMode=Icon(Icons.drive_eta);
+      });
+    }
+    else if(widget.modeOfTravel=="Bus"){
+      setState(() {
+        travelMode=Icon(Icons.directions_bus);
+      });
+    }
+    else if(widget.modeOfTravel=="Cab"){
+      setState(() {
+        travelMode=Icon(Icons.local_taxi);
+      });
+    }
+    else if(widget.modeOfTravel=="Self"){
+      setState(() {
+        travelMode=Icon(Icons.directions_bike);
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -818,13 +939,50 @@ class _ChatCardState extends State<ChatCard> {
           ),
           title: Text(widget.chatToName,style: GoogleFonts.aBeeZee(fontSize: 18.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
           subtitle: Text("Osho Customer",style: GoogleFonts.aBeeZee(fontSize: 16.0,fontWeight: FontWeight.w500)),
-          trailing: IconButton(icon: Icon(Icons.delete,color: deepRed,),
-          onPressed: (){
-            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
-            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
-          },
+          trailing: Container(
+            width: MediaQuery.of(context).size.width*0.2,
+            child: Row(
+              children: <Widget>[
+                StreamBuilder<QuerySnapshot>(
+                  stream:Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").snapshots() ,
+                  builder: (context, snapshot) {
+                    int unseen=0;
+                    if(snapshot.hasData){
+                      for(int i=0;i<snapshot.data.documents.length;i++){
+                        if(snapshot.data.documents.elementAt(i).data['seen']==false&&snapshot.data.documents.elementAt(i).data['accountEmail']==widget.chatToEmail.toString()){
+                          unseen++;
+                        }
+                      }
+                    }
+                    return unseen!=0?Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: deepRed,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Text("$unseen",style: GoogleFonts.aBeeZee(fontSize: 14,color: Colors.white),),
+                      ),
+                    ):travelMode;
+                  }
+                ),
+                IconButton(icon: Icon(Icons.delete,color: deepRed,),
+                onPressed: (){
+                  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
+                  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
+                },
+                ),
+              ],
+            ),
           ),
           onTap: (){
+            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").getDocuments().then((QuerySnapshot snapshot){
+                  for(int i=0;i<snapshot.documents.length;i++){
+                    Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(snapshot.documents.elementAt(i).data['id']).updateData({
+                      "seen":true,
+                    });
+                  }
+            });
             Navigator.push(context, MaterialPageRoute(
               builder: (context){
                 return Scaffold(
@@ -841,9 +999,9 @@ class _ChatCardState extends State<ChatCard> {
                       children: <Widget>[
                         StreamBuilder<QuerySnapshot>(
                           stream: Firestore.instance
-                              .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(20).orderBy('timestamp', descending: true).snapshots(),
+                              .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(100).orderBy('timestamp', descending: true).snapshots(),
                           builder: (context, snapshot) {
-                            return !snapshot.hasData?Center(child: CircularProgressIndicator()):Container(
+                            return !snapshot.hasData?Center(child: LinearProgressIndicator()):Container(
                               alignment: Alignment.topCenter,
                               child: Container(
                                 decoration: BoxDecoration(
@@ -891,8 +1049,13 @@ class _ChatCardState extends State<ChatCard> {
                                     "message":_messageController.text,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
+                                    "seen":false,
                                   }).then((value){
                                     setState(() {
+                                      Firestore.instance
+                                          .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(value.documentID).updateData({
+                                        "id":value.documentID,
+                                      });
                                       _messageController.clear();
                                     });
                                   });
@@ -903,6 +1066,11 @@ class _ChatCardState extends State<ChatCard> {
                                     'timestamp': DateTime.now().toIso8601String(),
                                   }).then((value){
                                     setState(() {
+                                      Firestore.instance
+                                          .collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                        "id":value.documentID,
+                                        "seen":false,
+                                      });
                                       _messageController.clear();
                                     });
                                   });
@@ -925,13 +1093,14 @@ class _ChatCardState extends State<ChatCard> {
   }
 }
 
-void addChat(String userEmail,String chatToEmail,String chatToName,String chatToImage){
+void addChat(String userEmail,String chatToEmail,String chatToName,String chatToImage,String mode){
   Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").get().then((value){
     if(!value.exists){
       Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").setData({
         "name":chatToName,
         "email":chatToEmail,
         "image":chatToImage,
+        "mode":mode
         });
        }
   });
@@ -943,6 +1112,7 @@ void addChat(String userEmail,String chatToEmail,String chatToName,String chatTo
             "name":doc.data['name'],
             "email":doc.data['email'],
             "image":doc.data['photoURL'],
+            "mode":mode,
           });
         }
       });
