@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:rooms/MyRide.dart';
 import 'package:rooms/aeoui.dart';
 
 List<Map<String,dynamic>> firebaseBooking=[];
@@ -20,7 +18,6 @@ class BookEvent extends StatefulWidget {
 }
 
 class _BookEventState extends State<BookEvent> {
-  final GlobalKey<ScaffoldState> _scaffoldKey=new GlobalKey<ScaffoldState>();
   bool adding=false;
   Razorpay _razorPay;
   @override

@@ -56,7 +56,6 @@ bool userexists=false;
           final Uri deepLink = dynamicLink?.link;
           if (deepLink != null) {
             createUser(deepLink.queryParameters['name'],deepLink.queryParameters['phone'],deepLink.queryParameters['email'],deepLink.queryParameters['password'],deepLink.queryParameters['gender']);
-            //_scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("SignUp Successful"),));
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context){
                 return AeoUI(username: deepLink.queryParameters['email'],currentState: 4,);
