@@ -8,14 +8,14 @@ import 'package:rooms/MyRide.dart';
 import 'package:rooms/hisroryAndWallet.dart';
 import 'package:rooms/profileImg.dart';
 import 'package:rooms/widgets/customshape.dart';
-
 import 'aeoui.dart';
 import 'helpAndSupport.dart';
 import 'newLoginscreen2.dart';
 
 class UserProfileUI extends StatefulWidget {
   final String email;
-  UserProfileUI(this.email);
+  final bool rememberMe;
+  UserProfileUI(this.email, this.rememberMe);
   @override
   _UserProfileUIState createState() => _UserProfileUIState();
 }
@@ -590,9 +590,12 @@ int retGender(AsyncSnapshot snapshot){
                               color: Color.fromRGBO(253, 11, 23, 1),
                             ),
                             onTap: (){
-                              signOutGoogle();
-                              loggedInEmail=null;
-                              facebookLogin.logOut();
+                              if(!widget.rememberMe){
+                                signOutGoogle();
+                                loggedInEmail=null;
+                                loggedInPassword=null;
+                                facebookLogin.logOut();
+                              }
                               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       NewLoginScreenTwo()));

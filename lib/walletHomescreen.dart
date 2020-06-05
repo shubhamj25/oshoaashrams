@@ -34,13 +34,18 @@ class WalletHomeScreen extends StatelessWidget {
                           SizedBox(
                             width: 16,
                           ),
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Colors.white,
-                            child: ClipOval(
-                              child: Image.asset(
-                                "assets/images/OshoLogo.png",
-                                fit: BoxFit.contain,
+                          InkWell(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.white,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  "assets/images/OshoLogo.png",
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           )

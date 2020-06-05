@@ -155,6 +155,7 @@ flutter:
     - assets/images/c5.jpg
     - assets/images/1080p.mp4
     - assets/images/1.PNG
+    - assets/images/login.jpeg
 
 
 
@@ -186,6 +187,10 @@ flutter:
         fonts:
           - asset: fonts/Raleway-Regular.ttf
           - asset: fonts/Raleway-SemiBold.ttf
+
+      - family: CustomIcons
+        fonts:
+          - asset: fonts/CustomIcons.ttf
 
   #   - family: Trajan Pro
   #     fonts:

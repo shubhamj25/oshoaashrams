@@ -24,6 +24,7 @@ import 'organiserPageNotifications.dart';
 import 'widgets/customshape.dart';
 
 String loggedInEmail;
+String loggedInPassword;
 Color deepRed=Color.fromRGBO(253, 11, 23, 1);
 class HomePage extends StatefulWidget {
   final String username;
@@ -936,7 +937,8 @@ class _HomePageState extends State<HomePage> {
 class AeoUI extends StatefulWidget {
   final String username;
   final int currentState;
-  AeoUI({this.username,this.currentState});
+  final bool rememberMe;
+  AeoUI({this.username,this.currentState, this.rememberMe});
   @override
   _AeoUIState createState() => _AeoUIState();
 }
@@ -1004,7 +1006,7 @@ class _AeoUIState extends State<AeoUI> {
   }
   @override
   Widget build(BuildContext context) {
-    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(email: widget.username,),SavedPage(email: widget.username,),UserProfileUI(widget.username)];
+    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(email: widget.username,),SavedPage(email: widget.username,),UserProfileUI(widget.username,widget.rememberMe)];
     return SafeArea(
       child: Scaffold(
         drawer: Drawer(
@@ -1055,7 +1057,7 @@ class _AeoUIState extends State<AeoUI> {
                   {
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            UserProfileUI(widget.username)))
+                            AeoUI(username:widget.username,rememberMe:widget.rememberMe,currentState: 4,)))
                   }),
               CustomListview(
                   Icons.contact_mail,
@@ -1097,9 +1099,12 @@ class _AeoUIState extends State<AeoUI> {
                   Icons.offline_bolt,
                   "LogOut",
                       () {
-                    signOutGoogle();
-                    loggedInEmail=null;
-                    facebookLogin.logOut();
+                    if(!widget.rememberMe){
+                      signOutGoogle();
+                      loggedInEmail = null;
+                      loggedInPassword=null;
+                      facebookLogin.logOut();
+                    }
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>
                             NewLoginScreenTwo()));
