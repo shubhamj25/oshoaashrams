@@ -87,6 +87,7 @@ class _NewSinupState extends State<NewSinup> {
       "email":email,
       "gender":gender,
       "password":password,
+      "walletBalance":0,
     });
   }
 

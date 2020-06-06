@@ -43,10 +43,10 @@ class _BookEventState extends State<BookEvent> {
     Firestore.instance.collection("users").document(widget.userEmail).get().then((doc){
       setState(() {
         options = {
-          'key': 'rzp_test_BEjEEhCpmE41rI',
+          'key': 'rzp_test_PyfpsGv8KwvPDJ',
           'amount': widget.eventPrice*persons.length*100,
           'name': 'Osho Aaashrams',
-          'description': '${widget.eventName} booking request by ${widget.userEmail}',
+          'description': '${widget.eventName} booking request by\n${widget.userEmail}',
           'prefill': {'contact': doc.data['phone'], 'email': widget.userEmail},
           'external': {
             'wallets': ['paytm']
@@ -63,7 +63,6 @@ class _BookEventState extends State<BookEvent> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-
     SafeArea(
       child: Flushbar(
         shouldIconPulse: true,
@@ -132,11 +131,11 @@ class _BookEventState extends State<BookEvent> {
         flushbarPosition: FlushbarPosition.TOP,
         shouldIconPulse: true,
         isDismissible: true,
-        titleText: Text("Payment Failed",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+        titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
         messageText: Text("Payment Made using ${response.walletName}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
         duration: Duration(seconds: 1),
-        icon: Icon(Icons.close,color: Colors.white,),
-        backgroundColor:  Colors.red,
+        icon: Icon(Icons.check,color: Colors.white,),
+        backgroundColor:  Colors.green,
       )..show(context).then((value){
         Firestore.instance.collection("${widget.userEmail}_bookings").add(
             {

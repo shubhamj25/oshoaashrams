@@ -213,7 +213,7 @@ int retGender(AsyncSnapshot snapshot){
                             color: Color.fromRGBO(253, 11, 23, 1),
                             onPressed: () {
                               Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (BuildContext context) => WalletApp()));
+                                  builder: (BuildContext context) => WalletApp(snapshot.data['email'])));
                             },
                             icon: Icon(
                               Icons.account_balance_wallet,

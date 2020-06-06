@@ -78,6 +78,7 @@ bool userexists=false;
       "email":email,
       "gender":gender,
       "password":password,
+      "walletBalance":0,
     });
   }
 
@@ -122,7 +123,7 @@ bool userexists=false;
                     Text("No Account Selected"),
                   ],
                 ),))).then((value){
-                  setState(() {
+                  _scaffoldKey.currentState.setState(() {
                     loggingin=false;
                   });
                 });
@@ -205,7 +206,8 @@ bool userexists=false;
               "name":profileData['name'],
               "email":profileData['email'],
               "photoURL":profileData['picture'],
-              "password":"oshoaashrams"
+              "password":"oshoaashrams",
+              "walletBalance":0,
             },merge: true);
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
               return AeoUI(username: profileData['email'],rememberMe:_rememberMe);
@@ -299,8 +301,8 @@ bool userexists=false;
                                         ),
                                         decoration: InputDecoration(
                                           errorMaxLines: 2,
-                                          hintStyle: TextStyle(color: Colors.white),
                                           errorStyle: GoogleFonts.balooBhaina(color: Colors.white),
+                                          hintStyle: TextStyle(color: Colors.white),
                                           contentPadding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
                                           border: InputBorder.none,
                                           hintText: 'Enter your Email'
@@ -632,7 +634,8 @@ void updateUserData(FirebaseUser user) async {
         'photoURL': user.photoUrl,
         'name': user.displayName,
         'lastSeen': DateTime.now(),
-        "password":"oshoaashrams"
+        "password":"oshoaashrams",
+        "walletBalance":0
       }, merge: true);
     }
     else

@@ -1084,7 +1084,7 @@ class _AeoUIState extends State<AeoUI> {
                       () =>
                   {
                     Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => WalletApp()))
+                        builder: (BuildContext context) => WalletApp(widget.username)))
                   }),
               CustomListview(
                   Icons.subscriptions,
