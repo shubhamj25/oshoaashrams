@@ -13,21 +13,6 @@ class _SubscritionHomePageState extends State<SubscritionHomePage> {
       appBar: AppBar(
         title: Text("Subscriptions"), centerTitle: true,
         backgroundColor: Colors.red,
-//        leading: IconButton(
-//            icon: Icon(
-//              FontAwesomeIcons.bars,
-//              color: Colors.white,
-//            ),
-//            onPressed: () => {}),
-//        title: Text("Plans"),
-//        actions: <Widget>[
-//          IconButton(icon: Icon(FontAwesomeIcons.coins), onPressed: () {}),
-//          IconButton(
-//              icon: Icon(FontAwesomeIcons.ellipsisV),
-//              onPressed: () {
-//                //
-//              }),
-//        ],
       ),
       body: Center(
         child: Container(

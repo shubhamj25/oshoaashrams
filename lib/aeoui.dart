@@ -4,7 +4,7 @@ import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/bottomNavigationPage3.dart';
 import 'package:rooms/newLoginscreen2.dart';
-import 'package:rooms/subscriptioncallingpage.dart';
+import 'package:rooms/subscriptionMainPage.dart';
 import 'package:rooms/userProfilePafe.dart';
 import 'OnGoingEvents.dart';
 import 'bottomnavigationpage2.dart';
@@ -653,7 +653,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                SubscriptionMyApp()));
+                                SubscritionHomePage()));
                       },
                       child: Container(
                         margin: EdgeInsets.only(top: 20),
@@ -668,7 +668,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                SubscriptionMyApp()));
+                                SubscritionHomePage()));
                       },
                       child: Container(
                         margin: EdgeInsets.only(top: 10),
@@ -1093,7 +1093,7 @@ class _AeoUIState extends State<AeoUI> {
                   {
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            SubscriptionMyApp()))
+                            SubscritionHomePage()))
                   }),
               CustomListview(
                   Icons.offline_bolt,

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:rooms/constant/constant.dart';
@@ -145,13 +146,15 @@ class _NewSinupState extends State<NewSinup> {
   }*/
   bool emailerror=false;
   bool passworderror=false;
+  bool mobileerror=false;
   int  _selectedGender=0;
   String gender;
   List<DropdownMenuItem<int>> genderList = [
     DropdownMenuItem(
       child: new Text('Select Gender',style:TextStyle(
         color: Colors.white,
-        fontFamily: 'OpenSans',
+          fontFamily: 'Raleway',
+          fontSize: 16.0
       ),),
       value: 0,
 
@@ -159,21 +162,24 @@ class _NewSinupState extends State<NewSinup> {
     DropdownMenuItem(
       child: new Text('Male',style:TextStyle(
         color: Colors.white,
-        fontFamily: 'OpenSans',
+          fontFamily: 'Raleway',
+          fontSize: 16.0
       ),),
       value: 1
     ),
     DropdownMenuItem(
       child: new Text('Female',style: TextStyle(
         color: Colors.white,
-        fontFamily: 'OpenSans',
+        fontFamily: 'Raleway',
+        fontSize: 16.0
       ),),
       value: 2,
     ),
     DropdownMenuItem(
       child: new Text('Other',style: TextStyle(
         color: Colors.white,
-        fontFamily: 'OpenSans',
+          fontFamily: 'Raleway',
+          fontSize: 16.0
       ),),
       value: 3,
     ),
@@ -196,7 +202,7 @@ class _NewSinupState extends State<NewSinup> {
                     decoration: BoxDecoration(
                         image: DecorationImage(
                             image:
-                                new AssetImage('assets/images/LoginImage.jpeg'),
+                                new AssetImage('assets/images/login.jpeg'),
                             fit: BoxFit.fill))),
               ),
 
@@ -226,7 +232,7 @@ class _NewSinupState extends State<NewSinup> {
                             Container(
                               alignment: Alignment.centerLeft,
                               decoration: BoxDecoration(
-                                color: !emailerror?Color(0xFF6CA8F1):Colors.redAccent,
+                                color: !emailerror?Colors.deepOrangeAccent:Colors.redAccent,
                                 borderRadius: BorderRadius.circular(10.0),
                                 boxShadow: [
                                   BoxShadow(
@@ -236,88 +242,101 @@ class _NewSinupState extends State<NewSinup> {
                                   ),
                                 ],
                               ),
-                              height: 80.0,
-                              child: TextFormField(
-                                controller: _emailController,
-                                onSaved: (String value){
-                                  setState(() {
-                                    emailData['to']=_emailController.text.trim();
-                                  });
-                                },
-                                validator:(String value){
-                                  Pattern pattern =
-                                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-                                  RegExp regex = new RegExp(pattern);
-                                  Firestore.instance.collection("users").document("${_emailController.text.trim()}").get().then((doc){
-                                    if(doc.exists){
-                                      if (!regex.hasMatch(value)){
-                                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                          content: Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal:12.0),
-                                                child: Icon(Icons.close,color:Colors.white),
-                                              ),
-                                              Text("Invalid Email"),
-                                            ],
-                                          ),
-                                        ));
+                              height: 60.0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    width:MediaQuery.of(context).size.width*0.6,
+                                    child: TextFormField(
+                                      controller: _emailController,
+                                      onSaved: (String value){
                                         setState(() {
-                                          emailerror=true;
+                                          emailData['to']=_emailController.text.trim();
                                         });
-                                        return "Please enter a valid email";
-                                      }
-                                      else {
-                                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                          content: Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal:12.0),
-                                                child: Icon(Icons.error,color:Colors.white),
-                                              ),
-                                              Text("Email Already Registered"),
-                                            ],
-                                          ),
-                                        ));
+                                      },
+                                      validator:(String value){
+                                        Pattern pattern =
+                                            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                                        RegExp regex = new RegExp(pattern);
+                                        if(value==null||value==""){
+                                          setState(() {
+                                            emailerror=true;
+                                          });
+                                          return "Please enter a email";
+                                        }
+                                        else{
+                                          Firestore.instance.collection("users").document("${_emailController.text.trim()}").get().then((doc){
+                                            if(doc.exists){
+                                              if (!regex.hasMatch(value)){
+                                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                                  content: Row(
+                                                    children: <Widget>[
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                                        child: Icon(Icons.close,color:Colors.white),
+                                                      ),
+                                                      Text("Invalid Email"),
+                                                    ],
+                                                  ),
+                                                ));
+                                                setState(() {
+                                                  emailerror=true;
+                                                });
+                                                return "Please enter a valid email";
+                                              }
+                                              else {
+                                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                                  content: Row(
+                                                    children: <Widget>[
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                                        child: Icon(Icons.error,color:Colors.white),
+                                                      ),
+                                                      Text("Email Already Registered"),
+                                                    ],
+                                                  ),
+                                                ));
+                                                setState(() {
+                                                  emailerror=true;
+                                                });
+                                                return "Email Already Registered";
+                                              }
+                                            }
+                                            else{
+                                              return null;
+                                            }
+                                          });
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (String val){
                                         setState(() {
-                                          emailerror=true;
+                                          emailerror=false;
                                         });
-                                        return "Email Already Registered";
-                                      }
-                                    }
-                                    else{
-                                      return null;
-                                    }
-                                  });
-                                  return null;
-                                },
-                                onChanged: (String val){
-                                  setState(() {
-                                    emailerror=false;
-                                  });
-                                },
-                                keyboardType: TextInputType.emailAddress,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'OpenSans',
-                                ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(top: 14.0),
-                                  prefixIcon: Icon(
-                                    Icons.email,
-                                    color: Colors.white,
+                                      },
+                                      keyboardType: TextInputType.emailAddress,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway',
+                                      ),
+                                      decoration: InputDecoration(
+                                        errorMaxLines: 2,
+                                        hintStyle: TextStyle(color: Colors.white),
+                                        errorStyle: GoogleFonts.balooBhaina(color: Colors.white),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
+                                        border: InputBorder.none,
+                                        hintText: 'Enter Your Email',
+                                      ),
+                                    ),
                                   ),
-                                  hintText: 'Enter your Email',
-                                  hintStyle: kHintTextStyle,
-                                ),
+                                  Icon(Icons.mail,color:Colors.white)
+                                ],
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
+
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -326,7 +345,7 @@ class _NewSinupState extends State<NewSinup> {
                             Container(
                               alignment: Alignment.centerLeft,
                               decoration: BoxDecoration(
-                                color: !passworderror?Color(0xFF6CA8F1):Colors.redAccent,
+                                color: !passworderror?Colors.deepOrangeAccent:Colors.redAccent,
                                 borderRadius: BorderRadius.circular(10.0),
                                 boxShadow: [
                                   BoxShadow(
@@ -336,47 +355,49 @@ class _NewSinupState extends State<NewSinup> {
                                   ),
                                 ],
                               ),
-                              height: 80.0,
-                              child: TextFormField(
-                                controller: _passwordController,
-                                validator: (String val){
-                                  if(val.length<8){
-                                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                      content: Row(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal:12.0),
-                                            child: Icon(Icons.error,color:Colors.white),
-                                          ),
-                                          Expanded(child: Text("Password must contain atleast 8 characters")),
-                                        ],
+                              height: 60.0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    width:MediaQuery.of(context).size.width*0.6,
+                                    child: TextFormField(
+                                      controller: _passwordController,
+                                      validator: (String val){
+                                        if(val.length<8){
+                                          setState(() {
+                                            passworderror=true;
+                                          });
+                                          return "8 characters atleast";
+                                        }
+                                        else{
+                                          setState(() {
+                                            passworderror=false;
+                                          });
+                                          return null;
+                                        }
+                                      },
+                                      obscureText: hidepass,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway',
                                       ),
-                                    ));
-                                    setState(() {
-                                      passworderror=true;
-                                    });
-                                    return "Password must contain atleast 8 characters";
-                                  }
-                                  else{
-                                    return null;
-                                  }
-                                },
-                                obscureText: hidepass,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'OpenSans',
-                                ),
-                                onChanged: (String val){
-                                  setState(() {
-                                    passworderror=false;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  errorStyle: TextStyle(color: Colors.white),
-                                  border: InputBorder.none,
-                                  errorMaxLines: null,
-                                  contentPadding: EdgeInsets.only(top: 14.0,left:14),
-                                  prefixIcon: IconButton(icon: Icon(hidepass?Icons.lock:Icons.lock_open,color: Colors.white,),onPressed: (){
+                                      onChanged: (String val){
+                                        setState(() {
+                                          passworderror=false;
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        errorMaxLines: 2,
+                                        hintStyle: TextStyle(color: Colors.white),
+                                        errorStyle: GoogleFonts.balooBhaina(color: Colors.white),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
+                                        border: InputBorder.none,
+                                        hintText: 'Enter Password',
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(icon: Icon(hidepass?Icons.lock:Icons.lock_open,color: Colors.white,),onPressed: (){
                                     setState(() {
                                       if(hidepass==true){
                                         hidepass=false;
@@ -386,9 +407,7 @@ class _NewSinupState extends State<NewSinup> {
                                       }
                                     });
                                   },),
-                                  hintText: 'Enter your Password',
-                                  hintStyle: kHintTextStyle,
-                                ),
+                                ],
                               ),
                             ),
 
@@ -397,7 +416,7 @@ class _NewSinupState extends State<NewSinup> {
                             Container(
                               alignment: Alignment.centerLeft,
                               decoration: BoxDecoration(
-                                color: Color(0xFF6CA8F1),
+                                color: Colors.deepOrangeAccent,
                                 borderRadius: BorderRadius.circular(10.0),
                                 boxShadow: [
                                   BoxShadow(
@@ -407,41 +426,38 @@ class _NewSinupState extends State<NewSinup> {
                                   ),
                                 ],
                               ),
-                              height: 80.0,
-                              child: TextFormField(
-                                controller: _nameController,
-                                validator: (String val){
-                                  if(val==null||val==""){
-                                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                      content: Row(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal:12.0),
-                                            child: Icon(Icons.error,color:Colors.white),
-                                          ),
-                                          Expanded(child: Text("Please enter your name")),
-                                        ],
+                              height: 60.0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    width:MediaQuery.of(context).size.width*0.6,
+                                    child: TextFormField(
+                                      controller: _nameController,
+                                      validator: (String val){
+                                        if(val==null||val==""){
+                                          return "Please enter your name";
+                                        }
+                                        else{
+                                          return null;
+                                        }
+                                      },
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway',
                                       ),
-                                    ));
-                                    return "Please enter your name";
-                                  }
-                                  else{
-                                    return null;
-                                  }
-                                },
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'OpenSans',
-                                ),
-                                decoration: InputDecoration(
-                                  errorStyle: TextStyle(color: Colors.white),
-                                  border: InputBorder.none,
-                                  errorMaxLines: null,
-                                  contentPadding: EdgeInsets.only(top: 14.0,left:14.0),
-                                  prefixIcon: Icon(Icons.person,color: Colors.white,),
-                                  hintText: 'Name',
-                                  hintStyle: kHintTextStyle,
-                                ),
+                                      decoration: InputDecoration(
+                                        errorMaxLines: 2,
+                                        hintStyle: TextStyle(color: Colors.white),
+                                        errorStyle: GoogleFonts.balooBhaina(color: Colors.white),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
+                                        border: InputBorder.none,
+                                        hintText: 'Name',
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(Icons.person,color: Colors.white,)
+                                ],
                               ),
                             ),
 
@@ -450,7 +466,7 @@ class _NewSinupState extends State<NewSinup> {
                             Container(
                               alignment: Alignment.centerLeft,
                               decoration: BoxDecoration(
-                                color: Color(0xFF6CA8F1),
+                                color: !mobileerror?Colors.deepOrangeAccent:Colors.redAccent,
                                 borderRadius: BorderRadius.circular(10.0),
                                 boxShadow: [
                                   BoxShadow(
@@ -460,43 +476,45 @@ class _NewSinupState extends State<NewSinup> {
                                   ),
                                 ],
                               ),
-                              height: 80.0,
-                              child: TextFormField(
-                                controller: _phoneController,
-                                keyboardType: TextInputType.phone,
-                                validator: (String val){
-                                  if(val.length!=10){
-                                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                      content: Row(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal:12.0),
-                                            child: Icon(Icons.error,color:Colors.white),
-                                          ),
-                                          Expanded(child: Text("Phone Number must contain 10 digits")),
-                                        ],
+                              height: 60.0,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    width:MediaQuery.of(context).size.width*0.6,
+                                    child: TextFormField(
+                                      controller: _phoneController,
+                                      keyboardType: TextInputType.phone,
+                                      validator: (String val){
+                                        if(val.length!=10){
+                                           setState(() {
+                                             mobileerror=true;
+                                           });
+                                          return "Invalid Number";
+                                        }
+                                        else{
+                                          setState(() {
+                                            mobileerror=false;
+                                          });
+                                          return null;
+                                        }
+                                      },
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway',
                                       ),
-                                    ));
-
-                                    return "Phone Number must contain 10 digits";
-                                  }
-                                  else{
-                                    return null;
-                                  }
-                                },
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'OpenSans',
-                                ),
-                                decoration: InputDecoration(
-                                  errorStyle: TextStyle(color: Colors.white),
-                                  border: InputBorder.none,
-                                  errorMaxLines: null,
-                                  contentPadding: EdgeInsets.only(top: 14.0,left:14),
-                                  prefixIcon: Icon(Icons.phone_android,color: Colors.white,),
-                                  hintText: 'Mobile',
-                                  hintStyle: kHintTextStyle,
-                                ),
+                                      decoration: InputDecoration(
+                                        errorMaxLines: 2,
+                                        hintStyle: TextStyle(color: Colors.white),
+                                        errorStyle: GoogleFonts.balooBhaina(color: Colors.white),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 8.0),
+                                        border: InputBorder.none,
+                                        hintText: 'Mobile Number',
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(Icons.phone_android,color:Colors.white),
+                                ],
                               ),
                             ),
 
@@ -505,7 +523,7 @@ class _NewSinupState extends State<NewSinup> {
                             Container(
                               alignment: Alignment.centerLeft,
                               decoration: BoxDecoration(
-                                color: Color(0xFF6CA8F1),
+                                color: Colors.deepOrangeAccent,
                                 borderRadius: BorderRadius.circular(10.0),
                                 boxShadow: [
                                   BoxShadow(
@@ -521,8 +539,8 @@ class _NewSinupState extends State<NewSinup> {
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton(
                                     icon: Icon(Icons.arrow_drop_down_circle,color:Colors.white),
-                                    dropdownColor: Color(0xFF6CA8F1),
-                                    focusColor:Color(0xFF6CA8F1),
+                                    dropdownColor: Colors.deepOrangeAccent,
+                                    focusColor: Colors.deepOrange,
                                     hint: new Text('Select Gender'),
                                     items: genderList,
                                     value: _selectedGender,
@@ -543,10 +561,9 @@ class _NewSinupState extends State<NewSinup> {
                                     isExpanded: true,
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontFamily: 'OpenSans',
+                                      fontFamily: 'Raleway',
                                     ),
                                     underline: null,
-
                                   ),
                                 )
                               ),
@@ -649,11 +666,11 @@ final kHintTextStyle = TextStyle(
 
 final kLabelStyle = TextStyle(
   color: Colors.white,
-  fontFamily: 'OpenSans',
+  fontFamily: 'Raleway',
 );
 
 final kBoxDecorationStyle = BoxDecoration(
-  color: Color(0xFF6CA8F1),
+  color: Colors.deepOrangeAccent,
   borderRadius: BorderRadius.circular(10.0),
   boxShadow: [
     BoxShadow(

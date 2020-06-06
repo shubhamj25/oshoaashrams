@@ -465,11 +465,13 @@ bool userexists=false;
                                     Firestore.instance.collection("users").document("${_emailController.text.trim()}").get().then((doc){
                                       if(doc.exists){
                                         if(_passwordController.text.trim()==doc.data['password']){
-                                          loggedInEmail=_emailController.text.trim();
-                                          loggedInPassword=_passwordController.text;
                                           Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
                                             return AeoUI(username: _emailController.text.trim(),rememberMe:_rememberMe);
-                                          }));
+                                          })).then((value){
+                                              loggedInEmail=_emailController.text.trim();
+                                              loggedInPassword=_passwordController.text;
+                                          });
+
                                         }else{
                                           _scaffoldKey.currentState.showSnackBar(SnackBar(backgroundColor: Colors.red,content: Row(
                                             children: <Widget>[
