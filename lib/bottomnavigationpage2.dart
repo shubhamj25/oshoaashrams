@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:groovin_widgets/groovin_expansion_tile.dart';
 import 'package:rooms/aeoui.dart';
 import 'organiserPageNotifications.dart';
@@ -32,13 +33,13 @@ class _BookingPageState extends State<BookingPage> {
                     children: <Widget>[
                       Text(
                         "Booking",
-                        style: TextStyle(
-                            color: Color.fromRGBO(253, 11, 23, 1), fontWeight: FontWeight.bold, fontSize: 35.0),
+                        style: GoogleFonts.aBeeZee(
+                            color: Colors.black, fontWeight: FontWeight.w500, fontSize: 30.0),
                       ),
                       Text(
                         "History",
-                        style: TextStyle(
-                            color: Color.fromRGBO(253, 11, 23, 1), fontWeight: FontWeight.bold, fontSize: 30.0),
+                        style: GoogleFonts.aBeeZee(
+                            color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 25.0),
                       ),
                     ],
                   ),
@@ -57,7 +58,7 @@ class _BookingPageState extends State<BookingPage> {
             ),
 
             StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance.collection("${widget.email}_bookings").orderBy('bookedAt',descending: true).snapshots(),
+              stream: Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.email}_bookings").orderBy('bookedAt',descending: true).snapshots(),
               builder: (context,snapshot){
                 bookings.clear();
                 if(snapshot.hasData){
@@ -76,7 +77,10 @@ class _BookingPageState extends State<BookingPage> {
                   child: Column(
                     children: bookings,
                   ),
-                ):Center(child: CircularProgressIndicator());
+                ):Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Center(child: Container(width: 27,height: 27,child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2,))),
+                );
               },
             )
           ],

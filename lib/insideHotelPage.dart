@@ -240,12 +240,12 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                     horizontal: 32.0,
                                   ),
                                   onPressed: () {
-                                    !favourite?Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'])
+                                    !favourite?Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title'])
                                     .setData({
                                       "eventName":snapshot.data['title'],
                                       "imageUrl":snapshot.data['imageUrl'],
                                     }):
-                                    Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title']).delete();
+                                    Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete();
                                     !favourite?_scaffoldKey.currentState.showSnackBar(SnackBar(
                                       content: Row(
                                         children: <Widget>[

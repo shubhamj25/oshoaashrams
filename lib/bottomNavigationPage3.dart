@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/insideHotelPagefromSaved.dart';
+import 'aeoui.dart';
 import 'organiserPageNotifications.dart';
 
 List<SavedEventCard> savedEvents=[];
@@ -31,13 +32,13 @@ class _SavedPageState extends State<SavedPage> {
                   children: <Widget>[
                     Text(
                       "Saved",
-                      style: TextStyle(
-                          color: Colors.red, fontWeight: FontWeight.bold, fontSize: 35.0),
+                      style: GoogleFonts.aBeeZee(
+                          color: Colors.black, fontWeight: FontWeight.w500, fontSize: 30.0),
                     ),
                     Text(
                       "Events",
-                      style: TextStyle(
-                          color: Colors.red, fontWeight: FontWeight.bold, fontSize: 30.0),
+                      style: GoogleFonts.aBeeZee(
+                          color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 25.0),
                     ),
                   ],
                 ),
@@ -56,7 +57,7 @@ class _SavedPageState extends State<SavedPage> {
           ),
 
           StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection("saved_${widget.email}").snapshots(),
+            stream: Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").snapshots(),
             builder: (context,snapshot){
               savedEvents.clear();
               if(snapshot.hasData){

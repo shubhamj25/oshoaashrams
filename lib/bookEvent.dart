@@ -76,7 +76,7 @@ class _BookEventState extends State<BookEvent> {
         icon: Icon(Icons.check,color: Colors.white,),
         backgroundColor:  Colors.green,
       )..show(context).then((value){
-        Firestore.instance.collection("${widget.userEmail}_bookings").add(
+        Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
             {
               "eventName":widget.eventName,
               "email":widget.userEmail,
@@ -85,10 +85,10 @@ class _BookEventState extends State<BookEvent> {
               "personDetails":firebaseBooking,
             }
         ).then((value){
-          Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+          Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
           });
-          Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+          Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
             for (DocumentSnapshot ds in snapshot.documents){
               ds.reference.delete();
             }});
@@ -115,7 +115,7 @@ class _BookEventState extends State<BookEvent> {
         icon: Icon(Icons.close,color: Colors.white,),
         backgroundColor:  Colors.red,
       )..show(context).then((value){
-        Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+        Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
           for (DocumentSnapshot ds in snapshot.documents){
             ds.reference.delete();
           }});
@@ -137,7 +137,7 @@ class _BookEventState extends State<BookEvent> {
         icon: Icon(Icons.check,color: Colors.white,),
         backgroundColor:  Colors.green,
       )..show(context).then((value){
-        Firestore.instance.collection("${widget.userEmail}_bookings").add(
+        Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
             {
               "eventName":widget.eventName,
               "email":widget.userEmail,
@@ -147,10 +147,10 @@ class _BookEventState extends State<BookEvent> {
             }
         ).then((value){
 
-          Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+          Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
           });
-          Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+          Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
             for (DocumentSnapshot ds in snapshot.documents){
               ds.reference.delete();
             }});
@@ -376,7 +376,7 @@ class _BookEventState extends State<BookEvent> {
                                   "walletBalance": document.data['walletBalance'] +
                                       widget.eventPrice * persons.length,
                                 }).then((v) {
-                                  Firestore.instance.collection("${widget.userEmail}_bookings").add(
+                                  Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
                                       {
                                         "eventName":widget.eventName,
                                         "email":widget.userEmail,
@@ -421,10 +421,10 @@ class _BookEventState extends State<BookEvent> {
                                       Navigator.pop(context);
                                     });
 
-                                    Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+                                    Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
                                       "bookingId":value.documentID,
                                     });
-                                    Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+                                    Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
                                       for (DocumentSnapshot ds in snapshot.documents){
                                         ds.reference.delete();
                                       }});
@@ -515,7 +515,7 @@ class _PersonCardState extends State<PersonCard> {
               ),
              IconButton(icon:Icon(Icons.delete,color: Colors.red,size: 25.0,),
              onPressed: (){
-              Firestore.instance.collection("${loggedInEmail}_${widget.eventName}_persons").document(widget.name).delete().then((value){
+              Firestore.instance.collection("bookings").document(loggedInEmail).collection("${loggedInEmail}_${widget.eventName}_persons").document(widget.name).delete().then((value){
                 persons.remove(PersonCard(widget.name,widget.email,widget.age, widget.gender, widget.eventName));
                 firebaseBooking.remove({
                   "name":widget.name,
@@ -875,7 +875,7 @@ class _AddPersonCardState extends State<AddPersonCard> {
                     color:  Color.fromRGBO(253, 11, 23, 1),
                     onPressed: (){
                       if(_formKey.currentState.validate()){
-                        Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").document(nameController.text.toString().trim()).setData({
+                        Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_${widget.eventName}_persons").document(nameController.text.toString().trim()).setData({
                           "name":nameController.text,
                           "email":emailController.text.trim(),
                           "gender":gender,

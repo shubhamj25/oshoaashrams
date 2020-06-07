@@ -31,13 +31,13 @@ class _OnGoingEventsState extends State<OnGoingEvents> {
                     children: <Widget>[
                       Text(
                         "Ongoing",
-                        style: TextStyle(
-                            color: Colors.red, fontWeight: FontWeight.bold, fontSize: 35.0),
+                        style: GoogleFonts.aBeeZee(
+                            color: Colors.black, fontWeight: FontWeight.w500, fontSize: 30.0),
                       ),
                       Text(
                         "Events",
-                        style: TextStyle(
-                            color: Colors.red, fontWeight: FontWeight.bold, fontSize: 30.0),
+                        style: GoogleFonts.aBeeZee(
+                            color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 25.0),
                       ),
                     ],
                   ),
