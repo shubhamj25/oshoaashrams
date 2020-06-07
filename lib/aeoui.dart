@@ -1,4 +1,5 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -947,48 +948,6 @@ class _AeoUIState extends State<AeoUI> {
   String drpdwmstr = "Events";
   int _currentIndex = 0;
   TextEditingController customController = new TextEditingController();
-  Future<String> createUserEventReview(BuildContext context) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Review the Event"),
-            content: TextField(
-              controller: customController,
-            ),
-            actions: [
-              DropdownButton<String>(
-                value: drpdwmstr,
-                onChanged: (String newValue) {
-                  setState(() {
-                    drpdwmstr = newValue;
-                  });
-                },
-                items: <String>[
-                  'Events',
-                  'Event 1',
-                  "Event 2",
-                  "Event 3",
-                  "Event 4"
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              MaterialButton(
-                child: Text("Submit"),
-                textColor: Colors.blue,
-                onPressed: () {
-                  Navigator.of(context).pop(customController.text.toString());
-                },
-                elevation: 5.0,
-              )
-            ],
-          );
-        });
-  }
   @override
   void initState() {
     // TODO: implement initState
@@ -1017,11 +976,19 @@ class _AeoUIState extends State<AeoUI> {
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: <Widget>[
-              DrawerHeader(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Material(
+              Container(
+                height: MediaQuery.of(context).size.height*0.3,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: <Color>[
+                      Colors.red,
+                      Colors.redAccent,
+                      Colors.red.shade400
+                    ])),
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Material(
                         borderRadius: BorderRadius.all(Radius.circular(70)),
                         elevation: 10,
                         child: Image.asset(
@@ -1030,25 +997,19 @@ class _AeoUIState extends State<AeoUI> {
                           height: 100,
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                        child: Text(
-                          "OSHO",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17.0),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        "Welcome to OSHO\n$loggedInEmail",
+                        style: GoogleFonts.aBeeZee(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 17.0),
+                      ),
+                    )
+                  ],
                 ),
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: <Color>[
-                      Colors.red,
-                      Colors.redAccent,
-                      Colors.red.shade400
-                    ])),
               ),
               CustomListview(
                   Icons.person,
@@ -1060,24 +1021,16 @@ class _AeoUIState extends State<AeoUI> {
                             AeoUI(username:widget.username,rememberMe:widget.rememberMe,currentState: 4,)))
                   }),
               CustomListview(
-                  Icons.contact_mail,
-                  "Event Registration",
-                      () =>
-                  {
-                    Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) => EventOrganiser()))
-                  }),
-              CustomListview(
                   Icons.rate_review,
                   "Review an event",
-                      () =>
-                  {
-                    createUserEventReview(context).then((value) {
-                      SnackBar mySnackbar =
-                      new SnackBar(content: Text("Review Saved !"));
-                      Scaffold.of(context).showSnackBar(mySnackbar);
-                    })
-                  }),
+                      (){
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ReviewCard();
+                            });
+                  }
+                  ),
               CustomListview(
                   Icons.account_balance_wallet,
                   "Wallet",
@@ -1230,6 +1183,214 @@ class CustomListview extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class ReviewCard extends StatefulWidget {
+  @override
+  _ReviewCardState createState() => _ReviewCardState();
+}
+
+class _ReviewCardState extends State<ReviewCard> {
+  final reviewController=TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  int  _selectedEvent=0;
+  String event;
+  List<String> events=['Select Event'];
+  List<DropdownMenuItem<int>> eventList = [
+    DropdownMenuItem(
+      child: new Text('Select Event',style:GoogleFonts.balooBhai(
+        color: Colors.blue,
+      ),),
+      value: 0,
+    ),
+  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Firestore.instance.collection("events").getDocuments().then((docs){
+      if(docs.documents.length>0){
+        for(int i=0;i<docs.documents.length;i++){
+          eventList.add( DropdownMenuItem(
+            child: new Text('${docs.documents.elementAt(i).data['title']}',style:GoogleFonts.balooBhai(
+              color: Colors.blue,
+            ),),
+            value: i+1,
+          ),);
+          events.add(docs.documents.elementAt(i).data['title']);
+        }
+      }
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context,setState){
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          ),
+          content:Container(
+            height: MediaQuery.of(context).size.height*0.6,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+            ),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Icon(Icons.person_add,size: 25,color: Colors.blueAccent,),
+                                  ),
+                                  Text("Review Event",style: TextStyle(fontSize: 22.0,fontWeight: FontWeight.w600),),
+                                ],
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.close,color: Colors.red,),
+                                onPressed: ()=>Navigator.pop(context),
+                              )
+                            ],
+                          ),
+                          Container(
+                            height: 400.0,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Material(
+                                        elevation: 5.0,
+                                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                        child: TextFormField(
+                                          style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.045,color:Colors.black,fontWeight: FontWeight.w700),
+                                          validator: (String value){
+                                            if(value==null||value==""){
+                                              return "Please Enter Something";
+                                            }
+                                            else{
+                                              return null;
+                                            }
+                                          },
+                                          onChanged: (String v){
+                                            _formKey.currentState.validate();
+                                          },
+                                          maxLines: 5,
+                                          keyboardType: TextInputType.text,
+                                          controller: reviewController,
+                                          decoration: InputDecoration(
+                                            labelText: "Review",
+                                            errorStyle: GoogleFonts.balooBhaina(),
+                                            labelStyle:TextStyle(fontSize: MediaQuery.of(context).size.width*0.045),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 18.0,vertical: 5.0),
+                                            suffixIcon: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Icon(Icons.rate_review,color: Colors.black,),
+                                            ),
+                                            border: InputBorder.none,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Material(
+                                          elevation: 5.0,
+                                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal:18.0),
+                                            child: DropdownButtonHideUnderline(
+                                              child: DropdownButtonFormField(
+                                                iconEnabledColor: deepRed,
+                                                iconDisabledColor: deepRed,
+                                                hint: new Text('Select Gender'),
+                                                decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  errorStyle: GoogleFonts.balooBhaina(),
+                                                ),
+                                                items: eventList,
+                                                validator: (int value){
+                                                  if(value==0){
+                                                    return "Please select an Event";
+                                                  }
+                                                  else{
+                                                    return null;
+                                                  }
+                                                },
+                                                value: _selectedEvent,
+                                                onChanged: (value) {
+                                                  _formKey.currentState.validate();
+                                                 setState(() {
+                                                   event=events.elementAt(value);
+                                                 });
+                                                },
+                                                isExpanded: true,
+                                                style: GoogleFonts.balooBhai(fontSize: MediaQuery.of(context).size.width*0.045,color:Colors.black,fontWeight: FontWeight.w500),
+                                              ),
+                                            ),
+                                          )
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                  ),
+                ),
+                Container(
+                  height: 40,
+                  width: MediaQuery.of(context).size.width,
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12),bottomRight: Radius.circular(12)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom:8.0),
+                      child: Text("Submit",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500,color: Colors.white),),
+                    ),
+                    color:  Color.fromRGBO(253, 11, 23, 1),
+                    onPressed: (){
+                      if(_formKey.currentState.validate()){
+                        Firestore.instance.collection("events").document(event).updateData({
+                          "reviews":FieldValue.arrayUnion([reviewController.text]),
+                        });
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

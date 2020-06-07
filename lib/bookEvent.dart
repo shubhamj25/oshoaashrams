@@ -193,7 +193,7 @@ class _BookEventState extends State<BookEvent> {
                             backgroundColor: Colors.redAccent,
                             child:Icon(Icons.close,color: Colors.white,),
                             onPressed: () {
-                              Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+                              Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
                                 for (DocumentSnapshot ds in snapshot.documents){
                                   ds.reference.delete();
                                 }});
@@ -306,13 +306,13 @@ class _BookEventState extends State<BookEvent> {
                           Padding(
                               padding: const EdgeInsets.only(bottom:8.0,left: 8.0,right:8.0),
                               child:StreamBuilder<QuerySnapshot>(
-                                stream: Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").snapshots(),
+                                stream: Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_${widget.eventName}_persons").snapshots(),
                                 builder: (context,snapshot){
                                   persons.clear();
                                   firebaseBooking.clear();
                                   Firestore.instance.collection("users").document(widget.userEmail.toString()).get().then((doc){
                                     if(doc.exists){
-                                      Firestore.instance.collection("${widget.userEmail}_${widget.eventName}_persons").document(doc.data['name'].toString()).setData({
+                                      Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_${widget.eventName}_persons").document(doc.data['name'].toString()).setData({
                                         "name":doc.data['name'],
                                         "email":doc.data['email'],
                                         "gender":doc.data['gender'],

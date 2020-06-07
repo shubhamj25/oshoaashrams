@@ -224,7 +224,7 @@ class _MyRideState extends State<MyRide> {
                         child: Column(
                           children: <Widget>[
                             StreamBuilder<QuerySnapshot>(
-                              stream: Firestore.instance.collection("rideReq_$loggedInEmail").snapshots(),
+                              stream: Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_$loggedInEmail").snapshots(),
                               builder: (context,snapshot){
                                 requests.clear();
                                 if(snapshot.hasData){
@@ -297,7 +297,7 @@ class _MyRideState extends State<MyRide> {
                             Container(
                               height: MediaQuery.of(context).size.height*0.8,
                               child: StreamBuilder<QuerySnapshot>(
-                                stream: Firestore.instance.collection("chats_$loggedInEmail").snapshots(),
+                                stream: Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").snapshots(),
                                 builder: (context, snapshot) {
                                   return !snapshot.hasData?Center(child: CircularProgressIndicator()):
                                   ListView.builder(
@@ -342,7 +342,7 @@ class _RideCardState extends State<RideCard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Firestore.instance.collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").get().then((doc){
+    Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").get().then((doc){
      setState(() {
        if(doc.exists){
            requestSent=true;
@@ -427,7 +427,7 @@ class _RideCardState extends State<RideCard> {
                                 List<String> ridePersons=[];
                                 Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
                                   if(doc.exists){
-                                    Firestore.instance.collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").setData({
+                                    Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").setData({
                                       "fromEmail":doc.data['email'],
                                       "name":doc.data['name'],
                                       "age":doc.data['age'],
@@ -444,7 +444,7 @@ class _RideCardState extends State<RideCard> {
                                   status="Canceled";
                                 });
                                 requestSent=false;
-                                Firestore.instance.collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").delete();
+                                Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").delete();
                               }
                             });
                           });
@@ -576,7 +576,7 @@ class _RequestCardState extends State<RequestCard> {
                               }else{
                                 reqAccepted=false;
                               }
-                              Firestore.instance.collection("rideReq_$loggedInEmail").document("from_${widget.email}").delete();
+                              Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_$loggedInEmail").document("from_${widget.email}").delete();
                             });
                           });
                         },
@@ -593,7 +593,9 @@ class _RequestCardState extends State<RequestCard> {
                           ],
                         ),
                         color: Colors.white,
-                        onPressed:()=>null,
+                        onPressed:(){
+                          Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_$loggedInEmail").document("from_${widget.email}").delete();
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all((Radius.circular(8.0))),
                         ),
@@ -651,7 +653,7 @@ class _CurrentRideCardState extends State<CurrentRideCard> {
         }
       });
     });
-    Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.userEmail}_info").get().then((doc){
+    Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.userEmail}_info").get().then((doc){
       setState(() {
         if(doc.exists){
           inTouch=true;
@@ -944,7 +946,7 @@ class _ChatCardState extends State<ChatCard> {
             child: Row(
               children: <Widget>[
                 StreamBuilder<QuerySnapshot>(
-                  stream:Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").snapshots() ,
+                  stream:Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").snapshots() ,
                   builder: (context, snapshot) {
                     int unseen=0;
                     if(snapshot.hasData){
@@ -968,17 +970,17 @@ class _ChatCardState extends State<ChatCard> {
                 ),
                 IconButton(icon: Icon(Icons.delete,color: deepRed,),
                 onPressed: (){
-                  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
-                  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
+                  Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
+                  Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
                 },
                 ),
               ],
             ),
           ),
           onTap: (){
-            Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").getDocuments().then((QuerySnapshot snapshot){
+            Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").getDocuments().then((QuerySnapshot snapshot){
                   for(int i=0;i<snapshot.documents.length;i++){
-                    Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(snapshot.documents.elementAt(i).data['id']).updateData({
+                    Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(snapshot.documents.elementAt(i).data['id']).updateData({
                       "seen":true,
                     });
                   }
@@ -1000,7 +1002,7 @@ class _ChatCardState extends State<ChatCard> {
                       children: <Widget>[
                         StreamBuilder<QuerySnapshot>(
                           stream: Firestore.instance
-                              .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(100).orderBy('timestamp', descending: true).snapshots(),
+                              .collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").limit(100).orderBy('timestamp', descending: true).snapshots(),
                           builder: (context, snapshot) {
                             return !snapshot.hasData?Center(child: LinearProgressIndicator()):Container(
                               alignment: Alignment.topCenter,
@@ -1046,7 +1048,7 @@ class _ChatCardState extends State<ChatCard> {
                                 icon: Icon(Icons.send,size:25.0,color: Colors.black,),
                                 onPressed: (){
                                   Firestore.instance
-                                      .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
+                                      .collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
                                     "message":_messageController.text,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
@@ -1054,21 +1056,21 @@ class _ChatCardState extends State<ChatCard> {
                                   }).then((value){
                                     setState(() {
                                       Firestore.instance
-                                          .collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(value.documentID).updateData({
+                                          .collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(value.documentID).updateData({
                                         "id":value.documentID,
                                       });
                                       _messageController.clear();
                                     });
                                   });
                                   Firestore.instance
-                                      .collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").add({
+                                      .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").add({
                                     "message":_messageController.text,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
                                   }).then((value){
                                     setState(() {
                                       Firestore.instance
-                                          .collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                          .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
                                         "id":value.documentID,
                                         "seen":false,
                                       });
@@ -1095,9 +1097,9 @@ class _ChatCardState extends State<ChatCard> {
 }
 
 void addChat(String userEmail,String chatToEmail,String chatToName,String chatToImage,String mode){
-  Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").get().then((value){
+  Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").get().then((value){
     if(!value.exists){
-      Firestore.instance.collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").setData({
+      Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${chatToEmail}_info").setData({
         "name":chatToName,
         "email":chatToEmail,
         "image":chatToImage,
@@ -1107,9 +1109,9 @@ void addChat(String userEmail,String chatToEmail,String chatToName,String chatTo
   });
   Firestore.instance.collection("users").document(userEmail).get().then((doc){
     if(doc.exists){
-      Firestore.instance.collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").get().then((value){
+      Firestore.instance.collection("chats").document(chatToEmail).collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").get().then((value){
         if(!value.exists){
-          Firestore.instance.collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").setData({
+          Firestore.instance.collection("chats").document(chatToEmail).collection("chats_$chatToEmail").document("chat_${chatToEmail}with${loggedInEmail}_info").setData({
             "name":doc.data['name'],
             "email":doc.data['email'],
             "image":doc.data['photoURL'],

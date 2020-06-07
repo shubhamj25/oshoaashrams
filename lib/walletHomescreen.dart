@@ -16,7 +16,7 @@ List<Map<String,dynamic>> transactions=[];
 
 class WalletHomeScreen extends StatefulWidget {
   final String email;
-  WalletHomeScreen({this.email});
+  WalletHomeScreen(this.email);
   @override
   _WalletHomeScreenState createState() => _WalletHomeScreenState();
 }
@@ -35,6 +35,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   final _sendMoneyFormKey = GlobalKey<FormState>();
   String _sendAmount;
   String _sendEmail;
+  String _reqEmail;
   bool processing=false;
   Razorpay _razorPay;
   @override
@@ -464,7 +465,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                                   return null;
                                                                                 }
                                                                               },
-                                                                              onChanged: (v)=>_addMoneyFormKey.currentState.validate(),
+                                                                              onChanged: (v)=>_requestMoneyFormKey.currentState.validate(),
                                                                               keyboardType: TextInputType.number,
                                                                               controller: _reqAmountController,
                                                                               cursorColor: Colors.blueAccent,
@@ -503,6 +504,16 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                             width:MediaQuery.of(context).size.width*0.55,
                                                                             child: TextFormField(
                                                                               validator:(String value){
+                                                                                Firestore.instance.collection("users").document(_reqEmail).get().then((value){
+                                                                                  if(value.exists){
+                                                                                    _sendEmailRegistered=true;
+                                                                                    _requestMoneyFormKey.currentState.validate();
+                                                                                  }
+                                                                                  else{
+                                                                                    _sendEmailRegistered=false;
+                                                                                    _requestMoneyFormKey.currentState.validate();
+                                                                                  }
+                                                                                });
                                                                                 Pattern pattern =
                                                                                     r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
                                                                                 RegExp regex = new RegExp(pattern);
@@ -512,12 +523,20 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                                 else if (!regex.hasMatch(value)) {
                                                                                   return "Enter a valid email";
                                                                                 }
-                                                                                else{
+                                                                                else if(_sendEmailRegistered==false){
+                                                                                  return "Unregistered Email";
+                                                                                }
+                                                                                else {
                                                                                   return null;
                                                                                 }
                                                                               },
-
-                                                                              onChanged: (v)=>_addMoneyFormKey.currentState.validate(),
+                                                                              onChanged: (v)
+                                                                              {
+                                                                                setState(() {
+                                                                                  _reqEmail=v;
+                                                                                });
+                                                                                _requestMoneyFormKey.currentState.validate();
+                                                                              },
                                                                               keyboardType: TextInputType.emailAddress,
                                                                               controller: _reqEmailController,
                                                                               cursorColor: Colors.blueAccent,
@@ -562,12 +581,10 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                                   return null;
                                                                                 }
                                                                               },
-                                                                              onChanged: (v)=>_addMoneyFormKey.currentState.validate(),
+                                                                              onChanged: (v)=>_requestMoneyFormKey.currentState.validate(),
                                                                               controller: _reqPurposeController,
                                                                               cursorColor: Colors.blueAccent,
                                                                               style: TextStyle(
-                                                                                  fontSize: 22.0,
-                                                                                  color: Colors.blueAccent,
                                                                                   fontFamily: 'Raleway',
                                                                                   fontWeight: FontWeight.bold
                                                                               ),
@@ -802,9 +819,11 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                                     Firestore.instance.collection("users").document(_sendEmail).get().then((value){
                                                                                       if(value.exists){
                                                                                           _sendEmailRegistered=true;
+                                                                                          _sendMoneyFormKey.currentState.validate();
                                                                                       }
                                                                                       else{
                                                                                           _sendEmailRegistered=false;
+                                                                                          _sendMoneyFormKey.currentState.validate();
                                                                                       }
                                                                                     });
                                                                                     Pattern pattern =
@@ -827,6 +846,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                                                     setState(() {
                                                                                       _sendEmail=v;
                                                                                     });
+                                                                                    _sendMoneyFormKey.currentState.validate();
                                                                                     },
                                                                                   keyboardType: TextInputType.emailAddress,
                                                                                   controller: _sendEmailController,

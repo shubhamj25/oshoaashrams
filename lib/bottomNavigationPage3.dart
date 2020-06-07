@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/insideHotelPagefromSaved.dart';
+import 'package:rooms/widgets/custom_icons_icons.dart';
 import 'aeoui.dart';
 import 'organiserPageNotifications.dart';
 
@@ -20,74 +21,81 @@ class _SavedPageState extends State<SavedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: new ListView(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical:20.0,horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical:20.0,horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      "Saved",
-                      style: GoogleFonts.aBeeZee(
-                          color: Colors.black, fontWeight: FontWeight.w500, fontSize: 30.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Saved",
+                          style: GoogleFonts.aBeeZee(
+                              color: Colors.black, fontWeight: FontWeight.w500, fontSize: 30.0),
+                        ),
+                        Text(
+                          "Events",
+                          style: GoogleFonts.aBeeZee(
+                              color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 25.0),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "Events",
-                      style: GoogleFonts.aBeeZee(
-                          color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 25.0),
-                    ),
-                  ],
-                ),
 
-                FloatingActionButton(
-                  heroTag: 1,
-                  backgroundColor: Colors.redAccent,
-                  child:Icon(Icons.notifications,color: Colors.white,),
-                  onPressed: () {
-                    Navigator.of(context).push(new MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            OrganiserNotifications()));
-                  },
-                )
-              ],),
-          ),
+                    FloatingActionButton(
+                      heroTag: 1,
+                      backgroundColor: Colors.redAccent,
+                      child:Icon(Icons.notifications,color: Colors.white,),
+                      onPressed: () {
+                        Navigator.of(context).push(new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                OrganiserNotifications()));
+                      },
+                    )
+                  ],),
+              ),
 
-          StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").snapshots(),
-            builder: (context,snapshot){
-              savedEvents.clear();
-              if(snapshot.hasData){
-                for(int i=0;i<snapshot.data.documents.length;i++){
-                  savedEvents.add(SavedEventCard(snapshot.data.documents.elementAt(i).data['eventName'],snapshot.data.documents.elementAt(i).data['imageUrl']));
-                }
-              }
-              return !snapshot.hasData?Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: LinearProgressIndicator(),
+              StreamBuilder<QuerySnapshot>(
+                stream: Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").snapshots(),
+                builder: (context,snapshot){
+                  savedEvents.clear();
+                  if(snapshot.hasData){
+                    for(int i=0;i<snapshot.data.documents.length;i++){
+                      savedEvents.add(SavedEventCard(snapshot.data.documents.elementAt(i).data['eventName'],
+                          snapshot.data.documents.elementAt(i).data['imageUrl'],
+                        snapshot.data.documents.elementAt(i).data['description'],
+                        snapshot.data.documents.elementAt(i).data['location'],
+
+                      ));
+                    }
+                  }
+                  return !snapshot.hasData?Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Container(width: 27,height: 27,child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2,)),
+                  )
+                      :
+                   Column(
+                     children: savedEvents,
+                   );
+                },
               )
-                  :
-               SingleChildScrollView(
-                 child: Column(
-                   children: savedEvents,
-                 ),
-                                
-               );
-            },
-          )
 
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
 class SavedEventCard extends StatefulWidget {
-  final String imageUrl,title;
-  SavedEventCard(this.title,this.imageUrl);
+  final String imageUrl,title,description,location;
+  SavedEventCard(this.title,this.imageUrl, this.description, this.location);
   @override
   _SavedEventCardState createState() => _SavedEventCardState();
 }
@@ -96,52 +104,74 @@ class _SavedEventCardState extends State<SavedEventCard> {
   @override
   Widget build(BuildContext context) {
     return  Padding(
-      padding: const EdgeInsets.symmetric(horizontal:16.0,vertical:6.0),
+      padding: const EdgeInsets.symmetric(horizontal:16.0,vertical: 6.0),
       child: Card(
         elevation: 10.0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          borderRadius: BorderRadius.all(Radius.circular(12.0)),
         ),
-        child: InkWell(
-          onTap: () {
-            Navigator.of(context).push(new MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    HotelDetailsPagefromSaved(eventName: widget.title,)));
-          },
-          child: Stack(
-            alignment: Alignment.bottomLeft,
-            children: <Widget>[
-              CachedNetworkImage(
-                imageUrl: widget.imageUrl,
-                fadeInDuration: Duration(milliseconds: 500),
-                fadeInCurve: Curves.easeIn,
-                imageBuilder: (context, imageProvider) => Container(
-                  width:350,
-                  height: 175,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    image: DecorationImage(
-                        colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
-                        image: imageProvider, fit: BoxFit.cover),
+        child: Column(
+          children: <Widget>[
+            Stack(
+              alignment: Alignment.bottomLeft,
+              children: <Widget>[
+                CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fadeInDuration: Duration(milliseconds: 500),
+                  fadeInCurve: Curves.easeIn,
+                  imageBuilder: (context, imageProvider) => Container(
+                    width:350,
+                    height: 175,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(topRight:Radius.circular(12.0),topLeft:Radius.circular(12.0)),
+                      image: DecorationImage(
+                          colorFilter: ColorFilter.mode(Colors.black26,BlendMode.darken),
+                          image: imageProvider, fit: BoxFit.cover),
+                    ),
+                  ),
+                  placeholder: (context, url) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical:32.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Positioned(
+                  top:8.0,
+                  left: MediaQuery.of(context).size.width*0.48,
+                  child: RaisedButton(
+                    elevation: 12.0,
+                    color: deepRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              HotelDetailsPagefromSaved(eventName: widget.title,)));
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Icon(CustomIcons.hotel,size: 16,color: Colors.white,),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text("Register",style: GoogleFonts.balooBhai(fontSize:16.0,color: Colors.white),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                placeholder: (context, url) => Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: 200,
+                Container(
+                  width: 200.0,
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Text(
                         widget.title,
                         style: GoogleFonts.aBeeZee(
@@ -152,10 +182,36 @@ class _SavedEventCardState extends State<SavedEventCard> {
                       ),
                     ),
                   ),
+                )
+              ],
+            ),
+            Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 ),
-              )
-            ],
-          ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: <Widget>[
+                      ListTile(
+                        leading:Icon(Icons.event),
+                        title:Text("Description",  style: GoogleFonts.balooBhai(fontSize: 18),),
+                        subtitle: Text("${widget.description}",
+                          style: GoogleFonts.raleway(fontSize: 16),
+                        ),
+                      ),
+                      ListTile(
+                        leading:Icon(Icons.location_on),
+                        title:Text("Location",  style: GoogleFonts.balooBhai(fontSize: 18),),
+                        subtitle: Text("${widget.location}",
+                          style: GoogleFonts.raleway(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
         ),
       ),
     );

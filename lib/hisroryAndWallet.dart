@@ -24,7 +24,7 @@ class _WalletAppState extends State<WalletApp> {
   @override
   Widget build(BuildContext context) {
     var screens = [
-      WalletHomeScreen(email: widget.email,),
+      WalletHomeScreen(widget.email),
       //CardScreen(),
       MoneyRequests(email: widget.email,),
     ]; //screens for each tab
@@ -338,7 +338,7 @@ class _MoneyReqCardState extends State<MoneyReqCard> {
                                                                                       shouldIconPulse: true,
                                                                                       isDismissible: true,
                                                                                       titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
-                                                                                      messageText: Text("${widget.amount} has benn deducted from your Osho Wallet",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+                                                                                      messageText: Text("${widget.amount} has been deducted from your Osho Wallet",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
                                                                                       duration: Duration(seconds: 3),
                                                                                       icon: Icon(Icons.check_circle,color: Colors.white,),
                                                                                       backgroundColor:  Colors.green,

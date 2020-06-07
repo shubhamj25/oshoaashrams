@@ -7,8 +7,7 @@ import 'aeoui.dart';
 
 class HotelDetailsPage extends StatefulWidget {
   final String eventName;
-  final bool rememberMe;
-  HotelDetailsPage({this.eventName, this.rememberMe});
+  HotelDetailsPage({this.eventName});
   @override
   _HotelDetailsPageState createState() => _HotelDetailsPageState();
 }
@@ -27,17 +26,17 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
           stream: Firestore.instance.collection("events").document(widget.eventName).snapshots(),
           builder: (context, snapshot) {
             starRating.clear();
-            Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'].toString()).get().then((doc){
-              setState(() {
-                if(doc.exists){
-                    favourite=true;
-                }
-                else{
-                    favourite=false;
-                }
-              });
-            });
             if(snapshot.hasData){
+              Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title'].toString()).get().then((doc){
+                setState(() {
+                  if(doc.exists){
+                    favourite=true;
+                  }
+                  else{
+                    favourite=false;
+                  }
+                });
+              });
               double rating=snapshot.data['rating'];
               int actualRating=rating.round();
               for(int i=0;i<actualRating;i++){
@@ -53,7 +52,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                 ),);
               }
             }
-            return !snapshot.hasData?Center(child: CircularProgressIndicator()):Stack(
+            return !snapshot.hasData?Center(child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2,)):Stack(
               children: <Widget>[
 
                 /*Container(
@@ -244,6 +243,8 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                     .setData({
                                       "eventName":snapshot.data['title'],
                                       "imageUrl":snapshot.data['imageUrl'],
+                                      "description":snapshot.data['description'],
+                                      "location":snapshot.data['location'],
                                     }):
                                     Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete();
                                     !favourite?_scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -281,9 +282,6 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                       backgroundColor: Color.fromRGBO(253, 11, 23, 1),
                                     ));
 
-//                                Navigator.of(context).push(MaterialPageRoute(
-//                                    builder: (BuildContext context) =>
-//                                        CreateEventUserForm()));
                                   },
                                 ),
                               ],

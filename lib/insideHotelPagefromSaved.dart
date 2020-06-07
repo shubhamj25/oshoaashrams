@@ -7,8 +7,7 @@ import 'bookEvent.dart';
 
 class HotelDetailsPagefromSaved extends StatefulWidget {
   final String eventName;
-  final bool rememberMe;
-  HotelDetailsPagefromSaved({this.eventName, this.rememberMe});
+  HotelDetailsPagefromSaved({this.eventName});
   @override
   _HotelDetailsPagefromSavedState createState() => _HotelDetailsPagefromSavedState();
 }
@@ -27,17 +26,17 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
             stream: Firestore.instance.collection("events").document(widget.eventName).snapshots(),
             builder: (context, snapshot) {
               starRating.clear();
-              Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'].toString()).get().then((doc){
-                setState(() {
-                  if(doc.exists){
-                    favourite=true;
-                  }
-                  else{
-                    favourite=false;
-                  }
-                });
-              });
               if(snapshot.hasData){
+                Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title'].toString()).get().then((doc){
+                  setState(() {
+                    if(doc.exists){
+                      favourite=true;
+                    }
+                    else{
+                      favourite=false;
+                    }
+                  });
+                });
                 double rating=snapshot.data['rating'];
                 int actualRating=rating.round();
                 for(int i=0;i<actualRating;i++){
@@ -53,12 +52,14 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                   ),);
                 }
               }
-              return !snapshot.hasData?Center(child: CircularProgressIndicator()):Stack(
+              return !snapshot.hasData?Center(child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2,)):Stack(
                 children: <Widget>[
+
                   /*Container(
                     foregroundDecoration: BoxDecoration(color: Colors.black26),
                     height: 400,
                     child: Image.asset(image, fit: BoxFit.cover)),*/
+
                   CachedNetworkImage(
                     imageUrl: snapshot.data['imageUrl'],
                     fadeInDuration: Duration(milliseconds: 500),
@@ -238,12 +239,14 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                       horizontal: 32.0,
                                     ),
                                     onPressed: () {
-                                      !favourite?Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title'])
+                                      !favourite?Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title'])
                                           .setData({
                                         "eventName":snapshot.data['title'],
                                         "imageUrl":snapshot.data['imageUrl'],
+                                        "description":snapshot.data['description'],
+                                        "location":snapshot.data['location'],
                                       }):
-                                      Firestore.instance.collection("saved_$loggedInEmail").document(snapshot.data['title']).delete();
+                                      Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete();
                                       !favourite?_scaffoldKey.currentState.showSnackBar(SnackBar(
                                           content: Row(
                                             children: <Widget>[
@@ -279,9 +282,6 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                         backgroundColor: Color.fromRGBO(253, 11, 23, 1),
                                       ));
 
-//                                Navigator.of(context).push(MaterialPageRoute(
-//                                    builder: (BuildContext context) =>
-//                                        CreateEventUserForm()));
                                     },
                                   ),
                                 ],
