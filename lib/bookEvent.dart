@@ -3,8 +3,10 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:rooms/aeoui.dart';
+import 'package:rooms/widgets/custom_icons_icons.dart';
 
 List<Map<String,dynamic>> firebaseBooking=[];
 
@@ -92,13 +94,11 @@ class _BookEventState extends State<BookEvent> {
             }});
           setState(() {
             adding=false;
-            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                builder: (context){
-                  return AeoUI(username: widget.userEmail,);
-                }
-            ), (route) => false);
           });
         });
+
+        Navigator.pop(context);
+
       }),
     );
   }
@@ -146,40 +146,6 @@ class _BookEventState extends State<BookEvent> {
               "personDetails":firebaseBooking,
             }
         ).then((value){
-          if(walletPay==true){
-            Firestore.instance.collection("users").document(widget.userEmail).get().then((doc){
-              if(doc.exists){
-                Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").add({
-                  "amount":widget.eventPrice*persons.length*100,
-                  "fromName":doc.data['name'],
-                  "toName":"Osho Ashrams",
-                  "fromEmail":doc.data['email'],
-                  "toEmail":"oshoyatra2002@gmail.com",
-                  "time":DateTime.now().toIso8601String(),
-                }).then((value) {
-                  Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").document(value.documentID).updateData(
-                      {
-                        "transactionId": value.documentID,
-                      });
-                  Firestore.instance.collection("walletTransactions").document("oshoyatra2002@gmail.com").collection("transactions").document(value.documentID).setData({
-                    "amount":widget.eventPrice*persons.length*100,
-                    "fromName":doc.data['name'],
-                    "toName":"Osho Ashrams",
-                    "fromEmail":doc.data['email'],
-                    "toEmail":"oshoyatra2002@gmail.com",
-                    "time":DateTime.now().toIso8601String(),
-                    "transactionId": value.documentID,
-                  });
-                }
-                );
-
-              }
-            });
-          }
-
-
-
-
 
           Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
@@ -190,13 +156,9 @@ class _BookEventState extends State<BookEvent> {
             }});
           setState(() {
             adding=false;
-            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                builder: (context){
-                  return AeoUI(username: widget.userEmail,);
-                }
-            ), (route) => false);
           });
         });
+        Navigator.pop(context);
       }),
     );
   }
@@ -275,6 +237,37 @@ class _BookEventState extends State<BookEvent> {
                         ],
                       ),
                     ),
+                    FadingText('Long Press to Pay',style: GoogleFonts.aBeeZee(fontSize: 16.0),),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal:16.0),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(top:8.0),
+                            child: Switch(
+                              value: walletPay,
+                              onChanged: (value) {
+                                setState(() {
+                                  walletPay = value;
+                                });
+                              },
+                              activeTrackColor: Colors.indigoAccent,
+                              activeColor: deepRed,
+                              inactiveTrackColor: Colors.grey,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top:8.0),
+                            child: Text(
+                              'Pay directly from Osho Wallet',
+                              style: GoogleFonts.balooBhai(color: Colors.black,fontSize: 18.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     InkWell(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom:20.0),
@@ -352,13 +345,120 @@ class _BookEventState extends State<BookEvent> {
               height: 50.0,
               width: MediaQuery.of(context).size.width,
               child: RaisedButton(
-                child: Text("Proceed to Pay",style: TextStyle(fontSize: 20.0,color: Colors.white),),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(walletPay?"Pay from Wallet":"Proceed to Pay",style: GoogleFonts.balooBhai(fontSize: 22.0,color: Colors.white),),
+                    adding?Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(width:25,height:25,child:CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2,)),
+                    ):Container()
+                  ],
+                ),
                 color: Color.fromRGBO(253, 11, 23, 1),
-                onPressed: (){
+                onLongPress: (){
                   setState(() {
                     adding=true;
                   });
-                  openCheckout();
+                  if(walletPay==true){
+                    Firestore.instance.collection("users").document(widget.userEmail).get().then((doc){
+                      if(doc.exists){
+                        if(doc.data['walletBalance']>=widget.eventPrice*persons.length){
+                          Firestore.instance.collection("users").document(widget.userEmail).updateData({
+                            "walletBalance":doc.data['walletBalance']-widget.eventPrice*persons.length,
+                          }).then((value) {
+                            Firestore.instance.collection("users").document("oshoyatra2002@gmail.com")
+                                .get()
+                                .then((document) {
+                              if (document.exists) {
+                                Firestore.instance.collection("users").document(
+                                    "oshoyatra2002@gmail.com").updateData({
+                                  "walletBalance": document.data['walletBalance'] +
+                                      widget.eventPrice * persons.length,
+                                }).then((v) {
+                                  Firestore.instance.collection("${widget.userEmail}_bookings").add(
+                                      {
+                                        "eventName":widget.eventName,
+                                        "email":widget.userEmail,
+                                        "totalPrice":persons.length*widget.eventPrice,
+                                        "bookedAt":Timestamp.now(),
+                                        "personDetails":firebaseBooking,
+                                      }
+                                  ).then((value){
+                                    Flushbar(
+                                      flushbarPosition: FlushbarPosition.TOP,
+                                      shouldIconPulse: true,
+                                      isDismissible: true,
+                                      titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                                      messageText: Text("Rs ${widget.eventPrice*persons.length} has been deducted from your Osho Wallet",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+                                      duration: Duration(seconds: 3),
+                                      icon: Icon(Icons.check,color: Colors.white,),
+                                      backgroundColor:  Colors.green,
+                                    )..show(context).then((v){
+                                      Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").add({
+                                        "amount":widget.eventPrice*persons.length,
+                                        "fromName":doc.data['name'],
+                                        "toName":"Osho Ashrams",
+                                        "fromEmail":doc.data['email'],
+                                        "toEmail":"oshoyatra2002@gmail.com",
+                                        "time":DateTime.now().toIso8601String(),
+                                      }).then((value) {
+                                        Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").document(value.documentID).updateData(
+                                            {
+                                              "transactionId": value.documentID,
+                                            });
+                                        Firestore.instance.collection("walletTransactions").document("oshoyatra2002@gmail.com").collection("transactions").document(value.documentID).setData({
+                                          "amount":widget.eventPrice*persons.length,
+                                          "fromName":doc.data['name'],
+                                          "toName":"Osho Ashrams",
+                                          "fromEmail":doc.data['email'],
+                                          "toEmail":"oshoyatra2002@gmail.com",
+                                          "time":DateTime.now().toIso8601String(),
+                                          "transactionId": value.documentID,
+                                        });
+                                      }
+                                      );
+                                      Navigator.pop(context);
+                                    });
+
+                                    Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+                                      "bookingId":value.documentID,
+                                    });
+                                    Firestore.instance.collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+                                      for (DocumentSnapshot ds in snapshot.documents){
+                                        ds.reference.delete();
+                                      }});
+                                    setState(() {
+                                      adding=false;
+                                     });
+                                  });
+                                });
+                              }
+                            });
+                          });
+                        }
+                        else{
+                          Flushbar(
+                            flushbarPosition: FlushbarPosition.TOP,
+                            shouldIconPulse: true,
+                            isDismissible: true,
+                            titleText: Text("Payment Failed",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+                            messageText: Text("Insufficient Balance in Osho Wallet\nPlease add Money to your wallet",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+                            duration: Duration(seconds: 2),
+                            icon: Icon(Icons.close,color: Colors.white,),
+                            backgroundColor: deepRed,
+                          )..show(context).then((value){
+                            setState(() {
+                              adding=false;
+                            });
+                          });
+                        }
+                      }
+                    });
+                  }
+                  else{
+                    openCheckout();
+                  }
                  },
               ),
             ),

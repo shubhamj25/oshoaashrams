@@ -123,9 +123,7 @@ bool userexists=false;
                     Text("No Account Selected"),
                   ],
                 ),))).then((value){
-                  _scaffoldKey.currentState.setState(() {
                     loggingin=false;
-                  });
                 });
               },
               child: Icon(CustomIcons.google,color: Colors.blueAccent,)),

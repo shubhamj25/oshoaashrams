@@ -116,8 +116,19 @@ class _MoneyRequestsState extends State<MoneyRequests> {
                         ));
                       }
                     }
-                    return !snapshot.hasData?Center(child: Container(width:27,height:27,child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2.0,)))
-                        :Column(children:moneyReq,);
+                    return !snapshot.hasData?Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Center(child: Container(width:27,height:27,child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2.0,))),
+                    )
+                        :snapshot.data.documents.length!=0?Column(children:moneyReq,):
+                    Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Center(
+                        child: Text("No Current Requests",
+                        style: GoogleFonts.balooBhaina(fontSize: 20.0),
+                        ),
+                      ),
+                    );
                   },
                 )
               ],

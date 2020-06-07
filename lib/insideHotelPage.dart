@@ -7,7 +7,8 @@ import 'aeoui.dart';
 
 class HotelDetailsPage extends StatefulWidget {
   final String eventName;
-  HotelDetailsPage({this.eventName});
+  final bool rememberMe;
+  HotelDetailsPage({this.eventName, this.rememberMe});
   @override
   _HotelDetailsPageState createState() => _HotelDetailsPageState();
 }

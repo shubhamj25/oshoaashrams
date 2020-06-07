@@ -7,7 +7,8 @@ import 'bookEvent.dart';
 
 class HotelDetailsPagefromSaved extends StatefulWidget {
   final String eventName;
-  HotelDetailsPagefromSaved({this.eventName});
+  final bool rememberMe;
+  HotelDetailsPagefromSaved({this.eventName, this.rememberMe});
   @override
   _HotelDetailsPagefromSavedState createState() => _HotelDetailsPagefromSavedState();
 }
