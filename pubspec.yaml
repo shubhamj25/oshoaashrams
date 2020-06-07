@@ -48,6 +48,7 @@ dependencies:
   flushbar:
   image_cropper:
   image_picker:
+  progress_indicators: ^0.1.5
   toggle_switch:
   firebase_storage:
   http:

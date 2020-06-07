@@ -1173,10 +1173,10 @@ class _ChatState extends State<Chat> {
 
 String month(int x){
   if(x==1){
-    return "January";
+    return "Jan";
   }
   else if(x==2){
-    return "February";
+    return "Feb";
   }
   else if(x==3){
     return "March";
@@ -1194,19 +1194,19 @@ String month(int x){
     return "July";
   }
   else if(x==8){
-    return "August";
+    return "Aug";
   }
   else if(x==9){
-    return "September";
+    return "Sept";
   }
   else if(x==10){
-    return "October";
+    return "Oct";
   }
   else if(x==12){
-    return "November";
+    return "Nov";
   }
   else if(x==12){
-    return "December";
+    return "Dec";
   }
   else{
     return "Wrong Month";

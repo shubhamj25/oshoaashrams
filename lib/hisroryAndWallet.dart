@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 import 'package:rooms/walletCardScreen.dart';
 import 'package:rooms/walletHomescreen.dart';
 import 'package:rooms/widgets/custom_icons_icons.dart';
@@ -24,7 +25,7 @@ class _WalletAppState extends State<WalletApp> {
   Widget build(BuildContext context) {
     var screens = [
       WalletHomeScreen(email: widget.email,),
-      CardScreen(),
+      //CardScreen(),
       MoneyRequests(email: widget.email,),
     ]; //screens for each tab
     return Scaffold(
@@ -35,13 +36,13 @@ class _WalletAppState extends State<WalletApp> {
         backgroundColor: Colors.white,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text("Home"),
+              icon: Icon(Icons.account_balance_wallet),
+              title: Text("Wallet"),
               backgroundColor: Colors.white),
-          BottomNavigationBarItem(
+          /*BottomNavigationBarItem(
               icon: Icon(Icons.credit_card),
               title: Text("Card"),
-              backgroundColor: Colors.red),
+              backgroundColor: Colors.red),*/
           BottomNavigationBarItem(
               icon: Icon(CustomIcons.money_bill),
               title: Text("Requests"),)
@@ -115,7 +116,7 @@ class _MoneyRequestsState extends State<MoneyRequests> {
                         ));
                       }
                     }
-                    return !snapshot.hasData?Center(child: CircularProgressIndicator())
+                    return !snapshot.hasData?Center(child: Container(width:27,height:27,child: CircularProgressIndicator(backgroundColor: Colors.white,strokeWidth: 2.0,)))
                         :Column(children:moneyReq,);
                   },
                 )
@@ -263,13 +264,19 @@ class _MoneyReqCardState extends State<MoneyReqCard> {
                                                                   ),
                                                                   Padding(
                                                                     padding: const EdgeInsets.all(16.0),
-                                                                    child: Text("Do you confirm Your payment of ₹ ${widget.amount} to ${widget.fromEmail} i.e ${widget.fromName} ?",
+                                                                    child: Text("Do you confirm Your payment of ₹ ${widget.amount} to ${widget.fromEmail} i.e ${widget.fromName} ?\n",
                                                                       style: GoogleFonts.raleway(fontSize: 18.0),
                                                                     ),
                                                                   ),
 
+
+                                                                  Padding(
+                                                                    padding: const EdgeInsets.all(16.0),
+                                                                    child: FadingText('Long Press to Confirm',style: GoogleFonts.raleway(fontSize: 18.0),),
+                                                                  ),
+
                                                                   InkWell(
-                                                                    onTap: (){
+                                                                    onLongPress: (){
                                                                       setState(() {
                                                                         processing=true;
                                                                       });
@@ -284,6 +291,32 @@ class _MoneyReqCardState extends State<MoneyReqCard> {
                                                                                   Firestore.instance.collection("users").document(widget.fromEmail).updateData({
                                                                                     "walletBalance":document.data['walletBalance']+widget.amount,
                                                                                   }).then((v){
+
+                                                                                    Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").add({
+                                                                                      "amount": widget.amount,
+                                                                                      "fromName":doc.data['name'],
+                                                                                      "toName":document.data['name'],
+                                                                                      "fromEmail":doc.data['email'],
+                                                                                      "toEmail":document.data['email'],
+                                                                                      "time":DateTime.now().toIso8601String(),
+                                                                                    }).then((value) {
+                                                                                      Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").document(value.documentID).updateData(
+                                                                                          {
+                                                                                            "transactionId": value.documentID,
+                                                                                          });
+                                                                                      Firestore.instance.collection("walletTransactions").document(widget.fromEmail).collection("transactions").document(value.documentID).setData({
+                                                                                        "amount": widget.amount,
+                                                                                        "fromName":doc.data['name'],
+                                                                                        "toName":document.data['name'],
+                                                                                        "fromEmail":doc.data['email'],
+                                                                                        "toEmail":document.data['email'],
+                                                                                        "time":DateTime.now().toIso8601String(),
+                                                                                        "transactionId": value.documentID,
+                                                                                      });
+                                                                                    }
+                                                                                    );
+
+
                                                                                     setState(() {
                                                                                       processing=false;
                                                                                     });
@@ -295,7 +328,7 @@ class _MoneyReqCardState extends State<MoneyReqCard> {
                                                                                       isDismissible: true,
                                                                                       titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
                                                                                       messageText: Text("${widget.amount} has benn deducted from your Osho Wallet",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
-                                                                                      duration: Duration(seconds: 2),
+                                                                                      duration: Duration(seconds: 3),
                                                                                       icon: Icon(Icons.check_circle,color: Colors.white,),
                                                                                       backgroundColor:  Colors.green,
                                                                                     )..show(context);
@@ -311,7 +344,7 @@ class _MoneyReqCardState extends State<MoneyReqCard> {
                                                                               isDismissible: true,
                                                                               titleText: Text("Payment Failed",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
                                                                               messageText: Text("Insufficient Balance in Osho Wallet.Please Add money to your Osho Wallet for InApp Transactions.",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
-                                                                              duration: Duration(seconds: 2),
+                                                                              duration: Duration(seconds: 3),
                                                                               icon: Icon(Icons.close,color: Colors.white,),
                                                                               backgroundColor:  deepRed,
                                                                             )..show(context).then((value){

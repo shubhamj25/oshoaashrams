@@ -61,7 +61,7 @@ class _BookEventState extends State<BookEvent> {
     });
 
   }
-
+  bool walletPay=false;
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     SafeArea(
       child: Flushbar(
@@ -146,6 +146,41 @@ class _BookEventState extends State<BookEvent> {
               "personDetails":firebaseBooking,
             }
         ).then((value){
+          if(walletPay==true){
+            Firestore.instance.collection("users").document(widget.userEmail).get().then((doc){
+              if(doc.exists){
+                Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").add({
+                  "amount":widget.eventPrice*persons.length*100,
+                  "fromName":doc.data['name'],
+                  "toName":"Osho Ashrams",
+                  "fromEmail":doc.data['email'],
+                  "toEmail":"oshoyatra2002@gmail.com",
+                  "time":DateTime.now().toIso8601String(),
+                }).then((value) {
+                  Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").document(value.documentID).updateData(
+                      {
+                        "transactionId": value.documentID,
+                      });
+                  Firestore.instance.collection("walletTransactions").document("oshoyatra2002@gmail.com").collection("transactions").document(value.documentID).setData({
+                    "amount":widget.eventPrice*persons.length*100,
+                    "fromName":doc.data['name'],
+                    "toName":"Osho Ashrams",
+                    "fromEmail":doc.data['email'],
+                    "toEmail":"oshoyatra2002@gmail.com",
+                    "time":DateTime.now().toIso8601String(),
+                    "transactionId": value.documentID,
+                  });
+                }
+                );
+
+              }
+            });
+          }
+
+
+
+
+
           Firestore.instance.collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
           });
