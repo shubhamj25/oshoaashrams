@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:rooms/aeoui.dart';
-import 'package:rooms/widgets/custom_icons_icons.dart';
 
 List<Map<String,dynamic>> firebaseBooking=[];
 
@@ -345,6 +344,7 @@ class _BookEventState extends State<BookEvent> {
               height: 50.0,
               width: MediaQuery.of(context).size.width,
               child: RaisedButton(
+                onPressed: ()=>null,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[

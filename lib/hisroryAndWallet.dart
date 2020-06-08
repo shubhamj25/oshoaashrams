@@ -4,10 +4,8 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicators/progress_indicators.dart';
-import 'package:rooms/walletCardScreen.dart';
 import 'package:rooms/walletHomescreen.dart';
 import 'package:rooms/widgets/custom_icons_icons.dart';
-
 import 'MyRide.dart';
 import 'aeoui.dart';
 

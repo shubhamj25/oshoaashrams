@@ -10,7 +10,6 @@ import 'package:rooms/userProfilePafe.dart';
 import 'OnGoingEvents.dart';
 import 'bottomnavigationpage2.dart';
 import 'constant/constant.dart';
-import 'eventOrganiser.dart';
 import 'hisroryAndWallet.dart';
 import 'model/aeospecials.dart';
 import 'model/aeowordlist.dart';
