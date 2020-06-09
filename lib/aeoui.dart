@@ -7,6 +7,7 @@ import 'package:rooms/bottomNavigationPage3.dart';
 import 'package:rooms/newLoginscreen2.dart';
 import 'package:rooms/subscriptionMainPage.dart';
 import 'package:rooms/userProfilePafe.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'OnGoingEvents.dart';
 import 'bottomnavigationpage2.dart';
 import 'constant/constant.dart';
@@ -947,6 +948,7 @@ class _AeoUIState extends State<AeoUI> {
   String drpdwmstr = "Events";
   int _currentIndex = 0;
   TextEditingController customController = new TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -1045,17 +1047,20 @@ class _AeoUIState extends State<AeoUI> {
                   {
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            SubscritionHomePage()))
+                            SubscritionHomePage(userEmail: loggedInEmail,)))
                   }),
               CustomListview(
                   Icons.offline_bolt,
                   "LogOut",
-                      () {
+                      () async {
                     if(!widget.rememberMe){
                       signOutGoogle();
                       loggedInEmail = null;
                       loggedInPassword=null;
                       facebookLogin.logOut();
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.remove('loggedInEmail');
+                      prefs.remove('loggedInPassword');
                     }
                     Navigator.of(context).push(new MaterialPageRoute(
                         builder: (BuildContext context) =>

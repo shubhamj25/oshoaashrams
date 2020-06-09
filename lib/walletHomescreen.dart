@@ -196,9 +196,11 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                   child: CircleAvatar(
                                     radius: 25,
                                     backgroundColor: Colors.white,
-                                    child: CachedNetworkImage(
-                                      imageUrl: snapshot.data['photoURL'],
-                                      fit: BoxFit.contain,
+                                    child: ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: snapshot.data['photoURL'],
+                                        fit: BoxFit.contain,
+                                      ),
                                     )
                                   ),
                                 ):Icon(Icons.account_circle,color: Colors.white,size: 35,)

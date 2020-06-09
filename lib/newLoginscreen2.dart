@@ -12,8 +12,10 @@ import 'package:rooms/forgetPassword.dart';
 import 'package:rooms/newDontHaveaAccount.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:rooms/widgets/custom_icons_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'aeoui.dart';
 import 'package:http/http.dart'as http;
+
 
 
 bool _rememberMe = false;
@@ -27,10 +29,21 @@ class NewLoginScreenTwo extends StatefulWidget {
 
 class _NewLoginScreenTwoState extends State<NewLoginScreenTwo> {
 bool userexists=false;
+var prefs;
   @override
   void initState() {
     super.initState();
     initDynamicLinks();
+    globalVarInit();
+
+  }
+
+  globalVarInit() async{
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      loggedInEmail = prefs.getString('loggedInEmail') ?? null;
+      loggedInPassword = prefs.getString('loggedInPassword') ?? null;
+    });
   }
 
   void initDynamicLinks() async {
@@ -145,7 +158,7 @@ bool userexists=false;
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (BuildContext context) => NewSinup()));
                },
-              heroTag: 223,
+              heroTag: 449,
               icon: Icon(Icons.group_add,color: deepRed,),
               label: Padding(
                 padding: const EdgeInsets.symmetric(horizontal:10.0,vertical: 3.0),
@@ -186,8 +199,10 @@ bool userexists=false;
   void onLoginStatusChanged(bool isLoggedIn,{Map<String,dynamic> profileData}) {
     setState(() {
       if(isLoggedIn){
-        setState(() {
+        setState(() async {
           loggedInEmail=profileData['email'];
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString('loggedInEmail', loggedInEmail);
         });
         Firestore.instance.collection("users").document("${profileData['email']}").get().then((doc){
           if(doc.exists){
@@ -196,8 +211,10 @@ bool userexists=false;
             }));
           }
           else{
-            setState(() {
+            setState(() async {
               loggedInEmail=profileData['email'];
+              final prefs = await SharedPreferences.getInstance();
+              prefs.setString('loggedInEmail', loggedInEmail);
             });
             Firestore.instance.collection("users").document("${profileData['email']}").setData({
               "uid":profileData['access_token'],
@@ -446,7 +463,7 @@ bool userexists=false;
                                               padding: const EdgeInsets.all(5.0),
                                               child: Icon(Icons.close,color:Colors.white),
                                             ),
-                                            Text("Invalid Session or Password might have been changed"),
+                                            Expanded(child: Text("Invalid Session or Password might have been changed")),
                                           ],
                                         ),));
                                         setState(() {
@@ -467,9 +484,12 @@ bool userexists=false;
                                         if(_passwordController.text.trim()==doc.data['password']){
                                           Navigator.pushReplacement(context, MaterialPageRoute(builder:(context){
                                             return AeoUI(username: _emailController.text.trim(),rememberMe:_rememberMe);
-                                          })).then((value){
+                                          })).then((value) async {
                                               loggedInEmail=_emailController.text.trim();
                                               loggedInPassword=_passwordController.text;
+                                              final prefs = await SharedPreferences.getInstance();
+                                              prefs.setString('loggedInEmail', _emailController.text.trim());
+                                              prefs.setString('loggedInPassword', _passwordController.text);
                                           });
 
                                         }else{
@@ -541,6 +561,18 @@ bool userexists=false;
                     ),
                   ),
                 ),
+                (loggedInPassword!=null&&loggedInEmail!=null)?Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: IconButton(icon: Icon(Icons.home,color: Colors.white,),
+                  onPressed: () async {
+                    setState(() {
+                      loggedInEmail=null;
+                      loggedInPassword=null;
+                      prefs.remove('loggedInEmail');
+                      prefs.remove('loggedInPassword');
+                    });
+                  },),
+                ):Container(),
                 widget.message!=null?Container(width:MediaQuery.of(context).size.width,height:50.0,color: Colors.blueAccent,child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal:20.0),
                   child: Row(
@@ -616,12 +648,15 @@ Future<String> signInWithGoogle() async {
 void signOutGoogle() async{
   await googleSignIn.signOut();
   loggedInEmail="";
-  print("User Sign Out");
+  final prefs = await SharedPreferences.getInstance();
+  prefs.remove('loggedInEmail');
 }
 
 
 void updateUserData(FirebaseUser user) async {
   loggedInEmail=user.email;
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('loggedInEmail', loggedInEmail);
   Firestore.instance.collection("users").document(user.email).get().then((value){
     if(!value.exists){
       DocumentReference ref = Firestore.instance.collection('users').document(user.email);

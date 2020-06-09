@@ -8,6 +8,7 @@ import 'package:rooms/MyRide.dart';
 import 'package:rooms/hisroryAndWallet.dart';
 import 'package:rooms/profileImg.dart';
 import 'package:rooms/widgets/customshape.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'aeoui.dart';
 import 'helpAndSupport.dart';
 import 'newLoginscreen2.dart';
@@ -493,6 +494,7 @@ int retGender(AsyncSnapshot snapshot){
                         ))
                       ],
                     ),
+
                     DataRow(
                       cells: <DataCell>[
                         DataCell(Text(
@@ -513,6 +515,34 @@ int retGender(AsyncSnapshot snapshot){
                             disabledBorder: InputBorder.none,
                           ),
                         ),)
+                      ],
+                    ),
+                    snapshot.data['subscription']!=null&&snapshot.data['subscription']!=""&&(snapshot.data['subscription']=="Gold"||snapshot.data['subscription']=="Diamond"||snapshot.data['subscription']=="Silver")?
+                    DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(
+                          "Subscription",
+                          style:
+                          TextStyle(fontWeight: FontWeight.w400, color: Colors.black),
+                        )),
+                        DataCell(Text(
+                          "${snapshot.data['subscription']}",
+                          style:
+                          TextStyle(fontWeight: FontWeight.w300, color: Colors.blue,fontSize: 16),
+                        ))
+                      ],
+                    ):DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(
+                          "Subscription",
+                          style:
+                          TextStyle(fontWeight: FontWeight.w400, color: Colors.black),
+                        )),
+                        DataCell(Text(
+                          "Inactive",
+                          style:
+                          TextStyle(fontWeight: FontWeight.w300, color: Colors.blue,fontSize: 16),
+                        ))
                       ],
                     ),
                   ]),
@@ -589,12 +619,15 @@ int retGender(AsyncSnapshot snapshot){
                               Icons.touch_app,
                               color: Color.fromRGBO(253, 11, 23, 1),
                             ),
-                            onTap: (){
+                            onTap: () async {
                               if(!widget.rememberMe){
                                 signOutGoogle();
                                 loggedInEmail=null;
                                 loggedInPassword=null;
                                 facebookLogin.logOut();
+                                final prefs = await SharedPreferences.getInstance();
+                                prefs.remove('loggedInEmail');
+                                prefs.remove('loggedInPassword');
                               }
                               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                                   builder: (BuildContext context) =>
