@@ -342,7 +342,7 @@ class _RideCardState extends State<RideCard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").get().then((doc){
+    Firestore.instance.collection("rideReq").document(widget.userEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").get().then((doc){
      setState(() {
        if(doc.exists){
            requestSent=true;
@@ -427,7 +427,7 @@ class _RideCardState extends State<RideCard> {
                                 List<String> ridePersons=[];
                                 Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
                                   if(doc.exists){
-                                    Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").setData({
+                                    Firestore.instance.collection("rideReq").document(widget.userEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").setData({
                                       "fromEmail":doc.data['email'],
                                       "name":doc.data['name'],
                                       "age":doc.data['age'],
@@ -435,6 +435,26 @@ class _RideCardState extends State<RideCard> {
                                       "image":doc.data['photoURL'],
                                       "persons":ridePersons,
                                       "rideBy":widget.userName,
+                                    }).then((value){
+                                      Firestore.instance.collection("notifications").document(loggedInEmail).collection("notifications_$loggedInEmail").add({
+                                        "message":"Ride Request has been sent to ${widget.userEmail}",
+                                        "timestamp":DateTime.now().toIso8601String(),
+                                        "seen":false
+                                      }).then((value){
+                                        Firestore.instance.collection("notifications").document(loggedInEmail).collection("notifications_$loggedInEmail").document(value.documentID).updateData({
+                                          "id":value.documentID,
+                                        });
+                                      });
+                                      Firestore.instance.collection("notifications").document(widget.userEmail).collection("notifications_${widget.userEmail}").add({
+                                        "message":"You have a new Ride request from $loggedInEmail",
+                                        "timestamp":DateTime.now().toIso8601String(),
+                                        "seen":false
+                                      }).then((value){
+                                        Firestore.instance.collection("notifications").document(widget.userEmail).collection("notifications_${widget.userEmail}").document(value.documentID).updateData({
+                                          "id":value.documentID,
+                                        });
+                                      });
+
                                     });
                                   }
                                 });
@@ -444,7 +464,18 @@ class _RideCardState extends State<RideCard> {
                                   status="Canceled";
                                 });
                                 requestSent=false;
-                                Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").delete();
+                                Firestore.instance.collection("rideReq").document(widget.userEmail).collection("rideReq_${widget.userEmail}").document("from_$loggedInEmail").delete();
+                                Firestore.instance.collection("notifications").document(loggedInEmail).collection("notifications_$loggedInEmail").add({
+                                  "message":"Ride Request to ${widget.userEmail} Cancelled",
+                                  "timestamp":DateTime.now().toIso8601String(),
+                                  "seen":false
+                                }).then((value){
+                                  Firestore.instance.collection("notifications").document(loggedInEmail).collection("notifications_$loggedInEmail").document(value.documentID).updateData({
+                                    "id":value.documentID,
+                                  });
+                                });
+
+
                               }
                             });
                           });
@@ -572,6 +603,16 @@ class _RequestCardState extends State<RequestCard> {
                                 Firestore.instance.collection("rides").document(widget.loggedInName).updateData({
                                   "persons":FieldValue.arrayUnion([widget.email]),
                                 });
+                                Firestore.instance.collection("notifications").document(widget.email).collection("notifications_${widget.email}").add({
+                                  "message":"Your ride request to $loggedInEmail has been accepted",
+                                  "timestamp":DateTime.now().toIso8601String(),
+                                  "seen":false
+                                }).then((value){
+                                  Firestore.instance.collection("notifications").document(widget.email).collection("notifications_${widget.email}").document(value.documentID).updateData({
+                                    "id":value.documentID,
+                                  });
+                                });
+
                                 reqAccepted=true;
                               }else{
                                 reqAccepted=false;
@@ -595,7 +636,16 @@ class _RequestCardState extends State<RequestCard> {
                         color: Colors.white,
                         onPressed:(){
                           Firestore.instance.collection("rideReq").document(loggedInEmail).collection("rideReq_$loggedInEmail").document("from_${widget.email}").delete();
-                        },
+                          Firestore.instance.collection("notifications").document(widget.email).collection("notifications_${widget.email}").add({
+                            "message":"Your ride request to $loggedInEmail has been rejected",
+                            "timestamp":DateTime.now().toIso8601String(),
+                            "seen":false
+                          }).then((value){
+                            Firestore.instance.collection("notifications").document(widget.email).collection("notifications_${widget.email}").document(value.documentID).updateData({
+                              "id":value.documentID,
+                            });
+                          });
+                          },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all((Radius.circular(8.0))),
                         ),
@@ -972,6 +1022,8 @@ class _ChatCardState extends State<ChatCard> {
                 onPressed: (){
                   Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").delete();
                   Firestore.instance.collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}_info").delete();
+                  Firestore.instance.collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").delete();
+                  Firestore.instance.collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with${loggedInEmail}_info").delete();
                 },
                 ),
               ],
@@ -1059,7 +1111,6 @@ class _ChatCardState extends State<ChatCard> {
                                           .collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").document(value.documentID).updateData({
                                         "id":value.documentID,
                                       });
-                                      _messageController.clear();
                                     });
                                   });
                                   Firestore.instance
@@ -1068,14 +1119,24 @@ class _ChatCardState extends State<ChatCard> {
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
                                   }).then((value){
-                                    setState(() {
-                                      Firestore.instance
-                                          .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                    Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").add({
+                                      "message":"Message from \n${widget.userEmail}\n\"${_messageController.text}\"",
+                                      "timestamp":DateTime.now().toIso8601String(),
+                                      "seen":false
+                                    }).then((value){
+                                      Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").document(value.documentID).updateData({
                                         "id":value.documentID,
-                                        "seen":false,
                                       });
-                                      _messageController.clear();
+                                      setState(() {
+                                        Firestore.instance
+                                            .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                          "id":value.documentID,
+                                          "seen":false,
+                                        });
+                                        _messageController.clear();
+                                      });
                                     });
+
                                   });
                                 },
                               ),

@@ -42,6 +42,7 @@ dependencies:
   firebase_core:
   groovin_widgets:
   cloud_functions:
+  flappy_search_bar:
   shared_preferences:
   flutter_advanced_networkimage: ^0.7.0
   razorpay_flutter:

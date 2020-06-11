@@ -125,8 +125,8 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
                     ),
                   ),
                   placeholder: (context, url) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical:32.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    padding: const EdgeInsets.symmetric(vertical:40.0),
+                    child: Center(child: Container(height:25,width: 25,child: CircularProgressIndicator(strokeWidth: 2,backgroundColor: Colors.white,))),
                   ),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),

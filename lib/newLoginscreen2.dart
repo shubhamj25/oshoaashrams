@@ -168,7 +168,7 @@ var prefs;
       ],
     );
   }
- bool hidepass=false;
+ bool hidepass=true;
 
   void initiateFacebookLogin() async {
     var facebookLoginResult =
@@ -409,7 +409,7 @@ var prefs;
 
                           if(loggedInPassword!=null&&loggedInEmail!=null)
                               Padding(
-                                padding: const EdgeInsets.all(20.0),
+                                padding: const EdgeInsets.all(16.0),
                                 child: Text("You previously Signed in with $loggedInEmail.\nDo you want to Continue ?",textAlign: TextAlign.center
                                 ,style: GoogleFonts.balooBhai(fontSize: 20,color: Colors.white,),),
                               ),

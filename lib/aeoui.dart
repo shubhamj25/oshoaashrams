@@ -29,7 +29,8 @@ String loggedInPassword;
 Color deepRed=Color.fromRGBO(253, 11, 23, 1);
 class HomePage extends StatefulWidget {
   final String username;
-  HomePage({this.username});
+  bool rememberMe;
+  HomePage({this.username,this.rememberMe});
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -525,7 +526,7 @@ class _HomePageState extends State<HomePage> {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => OnGoingEvents()));
+                    builder: (BuildContext context) =>AeoUI(currentState: 1,username: loggedInEmail,rememberMe: widget.rememberMe,)));
               },
               child: Padding(
                 padding: EdgeInsets.only(top: 20, left: 10, right: 10),
@@ -542,7 +543,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                BookingPage()));
+                                AeoUI(currentState: 2,username: loggedInEmail,rememberMe: widget.rememberMe,)));
                       },
                       child: Container(
                         //color: Colors.blue,
@@ -570,7 +571,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                BookingPage()));
+                                AeoUI(currentState: 2,username: loggedInEmail,rememberMe: widget.rememberMe,)));
                       },
                       child: Container(
                         margin: EdgeInsets.only(top: 20),
@@ -585,7 +586,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                BookingPage()));
+                                AeoUI(currentState: 2,username: loggedInEmail,rememberMe: widget.rememberMe,)));
                       },
                       child: Container(
                         //color: Colors.blue,
@@ -654,7 +655,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                SubscritionHomePage()));
+                                SubscritionHomePage(userEmail: loggedInEmail,)));
                       },
                       child: Container(
                         margin: EdgeInsets.only(top: 20),
@@ -669,7 +670,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                SubscritionHomePage()));
+                                SubscritionHomePage(userEmail: loggedInEmail,)));
                       },
                       child: Container(
                         margin: EdgeInsets.only(top: 10),
@@ -966,7 +967,7 @@ class _AeoUIState extends State<AeoUI> {
   }
   @override
   Widget build(BuildContext context) {
-    List<Widget> _pageOptions=[HomePage(username: widget.username,),OnGoingEvents(),BookingPage(email: widget.username,),SavedPage(email: widget.username,),UserProfileUI(widget.username,widget.rememberMe)];
+    List<Widget> _pageOptions=[HomePage(username: widget.username,rememberMe: widget.rememberMe,),OnGoingEvents(),BookingPage(email: widget.username,),SavedPage(email: widget.username,),UserProfileUI(widget.username,widget.rememberMe)];
     return SafeArea(
       child: Scaffold(
         drawer: Drawer(

@@ -131,7 +131,7 @@ class _SavedEventCardState extends State<SavedEventCard> {
                   ),
                   placeholder: (context, url) => Padding(
                     padding: const EdgeInsets.symmetric(vertical:32.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: Container(width:25,height: 25,child: CircularProgressIndicator(strokeWidth: 2,backgroundColor: Colors.white,))),
                   ),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),

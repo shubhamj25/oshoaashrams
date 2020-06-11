@@ -72,7 +72,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                             image: imageProvider, fit: BoxFit.cover),
                       ),
                     ),
-                    placeholder: (context, url) => CircularProgressIndicator(),
+                    placeholder: (context, url) => LinearProgressIndicator(),
                     errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
 
