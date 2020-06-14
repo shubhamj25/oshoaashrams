@@ -75,7 +75,7 @@ class _BookEventState extends State<BookEvent> {
         icon: Icon(Icons.check,color: Colors.white,),
         backgroundColor:  Colors.green,
       )..show(context).then((value){
-        Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
+        Firestore.instance.collection("bookings").add(
             {
               "eventName":widget.eventName,
               "email":widget.userEmail,
@@ -85,7 +85,7 @@ class _BookEventState extends State<BookEvent> {
               "personDetails":firebaseBooking,
             }
         ).then((value){
-          Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+          Firestore.instance.collection("bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
           });
           Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
@@ -137,7 +137,7 @@ class _BookEventState extends State<BookEvent> {
         icon: Icon(Icons.check,color: Colors.white,),
         backgroundColor:  Colors.green,
       )..show(context).then((value){
-        Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
+        Firestore.instance.collection("bookings").add(
             {
               "eventName":widget.eventName,
               "email":widget.userEmail,
@@ -148,7 +148,7 @@ class _BookEventState extends State<BookEvent> {
             }
         ).then((value){
 
-          Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+          Firestore.instance.collection("bookings").document(value.documentID).updateData({
             "bookingId":value.documentID,
           });
           Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
@@ -379,7 +379,7 @@ class _BookEventState extends State<BookEvent> {
                                   "walletBalance": document.data['walletBalance'] +
                                       widget.eventPrice * persons.length,
                                 }).then((v) {
-                                  Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").add(
+                                  Firestore.instance.collection("bookings").add(
                                       {
                                         "eventName":widget.eventName,
                                         "email":widget.userEmail,
@@ -425,7 +425,7 @@ class _BookEventState extends State<BookEvent> {
                                       Navigator.pop(context);
                                     });
 
-                                    Firestore.instance.collection("bookings").document(loggedInEmail).collection("${widget.userEmail}_bookings").document(value.documentID).updateData({
+                                    Firestore.instance.collection("bookings").document(value.documentID).updateData({
                                       "bookingId":value.documentID,
                                     });
                                     Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
