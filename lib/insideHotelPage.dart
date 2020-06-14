@@ -194,7 +194,7 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                     Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
                                       if((doc.data['name']!=null&&doc.data['name']!="")&&(doc.data['email']!=null&&doc.data['email']!="")&&(doc.data['gender']!=null&&doc.data['gender']!="")&&(doc.data['age']!=null&&doc.data['age']!="")){
                                         Navigator.push(context, MaterialPageRoute(builder: (context){
-                                          return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],);
+                                          return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],ashramEmail: snapshot.data['email'],);
                                         }));
                                       }
                                       else{
@@ -245,6 +245,10 @@ class _HotelDetailsPageState extends State<HotelDetailsPage> {
                                       "imageUrl":snapshot.data['imageUrl'],
                                       "description":snapshot.data['description'],
                                       "location":snapshot.data['location'],
+                                      "email":snapshot.data['email'],
+                                      "ashram":snapshot.data['ashram'],
+                                      "start":snapshot.data['start'],
+                                      "end":snapshot.data['end'],
                                     }):
                                     Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete();
                                     !favourite?_scaffoldKey.currentState.showSnackBar(SnackBar(

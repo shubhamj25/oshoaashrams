@@ -11,9 +11,9 @@ List<Map<String,dynamic>> firebaseBooking=[];
 
 List<PersonCard> persons=[];
 class BookEvent extends StatefulWidget {
-  final String eventName,userEmail;
+  final String eventName,userEmail,ashramEmail;
   final int eventPrice;
-  BookEvent({this.eventName, this.userEmail,this.eventPrice});
+  BookEvent({this.eventName, this.userEmail,this.eventPrice, this.ashramEmail});
   @override
   _BookEventState createState() => _BookEventState();
 }
@@ -81,6 +81,7 @@ class _BookEventState extends State<BookEvent> {
               "email":widget.userEmail,
               "totalPrice":persons.length*widget.eventPrice,
               "bookedAt":Timestamp.now(),
+              "ashramEmail":widget.ashramEmail,
               "personDetails":firebaseBooking,
             }
         ).then((value){
@@ -142,6 +143,7 @@ class _BookEventState extends State<BookEvent> {
               "email":widget.userEmail,
               "totalPrice":persons.length*widget.eventPrice,
               "bookedAt":Timestamp.now(),
+              "ashramEmail":widget.ashramEmail,
               "personDetails":firebaseBooking,
             }
         ).then((value){
@@ -316,6 +318,7 @@ class _BookEventState extends State<BookEvent> {
                                         "email":doc.data['email'],
                                         "gender":doc.data['gender'],
                                         "age":doc.data['age'],
+                                        "ashramEmail":widget.ashramEmail,
                                         "eventName":widget.eventName,
                                       });
                                     }
@@ -382,6 +385,7 @@ class _BookEventState extends State<BookEvent> {
                                         "email":widget.userEmail,
                                         "totalPrice":persons.length*widget.eventPrice,
                                         "bookedAt":Timestamp.now(),
+                                        "ashramEmail":widget.ashramEmail,
                                         "personDetails":firebaseBooking,
                                       }
                                   ).then((value){

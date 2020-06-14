@@ -67,10 +67,10 @@ class _SavedPageState extends State<SavedPage> {
                   if(snapshot.hasData){
                     for(int i=0;i<snapshot.data.documents.length;i++){
                       savedEvents.add(SavedEventCard(snapshot.data.documents.elementAt(i).data['eventName'],
+                        snapshot.data.documents.elementAt(i).data['ashram'],
                           snapshot.data.documents.elementAt(i).data['imageUrl'],
                         snapshot.data.documents.elementAt(i).data['description'],
                         snapshot.data.documents.elementAt(i).data['location'],
-
                       ));
                     }
                   }
@@ -94,8 +94,8 @@ class _SavedPageState extends State<SavedPage> {
 }
 
 class SavedEventCard extends StatefulWidget {
-  final String imageUrl,title,description,location;
-  SavedEventCard(this.title,this.imageUrl, this.description, this.location);
+  final String imageUrl,title,description,location,ashram;
+  SavedEventCard(this.title,this.ashram,this.imageUrl, this.description, this.location);
   @override
   _SavedEventCardState createState() => _SavedEventCardState();
 }
@@ -167,18 +167,39 @@ class _SavedEventCardState extends State<SavedEventCard> {
                   ),
                 ),
                 Container(
-                  width: 200.0,
+                  width: 300.0,
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        widget.title,
-                        style: GoogleFonts.aBeeZee(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.title,
+                            style: GoogleFonts.aBeeZee(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(CustomIcons.place_of_worship,size: 20,color: Colors.white,),
+                              ),
+                              Text(
+                                widget.ashram,
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),

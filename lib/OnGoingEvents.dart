@@ -65,7 +65,8 @@ class _OnGoingEventsState extends State<OnGoingEvents> {
                   ongoingEvents.clear();
                   if(snapshot.hasData){
                     for(int i=0;i<snapshot.data.documents.length;i++){
-                      ongoingEvents.add(OngoingEventCard(snapshot.data.documents.elementAt(i).data['title']
+                      ongoingEvents.add(OngoingEventCard(snapshot.data.documents.elementAt(i).data['title'],
+                          snapshot.data.documents.elementAt(i).data['ashram']
                           ,snapshot.data.documents.elementAt(i).data['imageUrl'],
                           snapshot.data.documents.elementAt(i).data['description'],
                           snapshot.data.documents.elementAt(i).data['location']
@@ -89,8 +90,8 @@ class _OnGoingEventsState extends State<OnGoingEvents> {
 
 
 class OngoingEventCard extends StatefulWidget {
-  final String imageUrl,title,description,location;
-  OngoingEventCard(this.title,this.imageUrl, this.description, this.location);
+  final String imageUrl,title,description,location,ashram;
+  OngoingEventCard(this.title,this.ashram,this.imageUrl, this.description, this.location);
   @override
   _OngoingEventCardState createState() => _OngoingEventCardState();
 }
@@ -162,18 +163,39 @@ class _OngoingEventCardState extends State<OngoingEventCard> {
                   ),
                 ),
                 Container(
-                  width: 200.0,
+                  width: 300.0,
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        widget.title,
-                        style: GoogleFonts.aBeeZee(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.title,
+                            style: GoogleFonts.aBeeZee(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(CustomIcons.place_of_worship,color: Colors.white,size: 20,),
+                              ),
+                              Text(
+                                widget.ashram,
+                                style: GoogleFonts.aBeeZee(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
