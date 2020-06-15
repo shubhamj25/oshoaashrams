@@ -8,6 +8,7 @@ import 'package:rooms/newLoginscreen2.dart';
 import 'package:rooms/subscriptionMainPage.dart';
 import 'package:rooms/userProfilePafe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'OnGoingEvents.dart';
 import 'bottomnavigationpage2.dart';
 import 'constant/constant.dart';
@@ -1230,6 +1231,7 @@ class _ReviewCardState extends State<ReviewCard> {
       }
     });
   }
+  double reviewedRating=3.5;
   @override
   Widget build(BuildContext context) {
     return StatefulBuilder(
@@ -1355,6 +1357,29 @@ class _ReviewCardState extends State<ReviewCard> {
                                           )
                                       ),
                                     ),
+
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: SmoothStarRating(
+                                          allowHalfRating: true,
+                                          onRated: (v) {
+                                            setState(() {
+                                              reviewedRating=v;
+                                            });
+                                          },
+                                          filledIconData: Icons.star,
+                                          halfFilledIconData: Icons.star_half,
+                                          defaultIconData: Icons.star_border,
+                                          starCount: 5,
+                                          rating: reviewedRating,
+                                          size: 40,
+                                          isReadOnly:false,
+                                          color: Colors.yellow,
+                                          borderColor: Colors.yellow,
+                                          spacing:0.0
+                                      ),
+                                    )
+
                                   ],
                                 ),
                               ),
@@ -1369,6 +1394,8 @@ class _ReviewCardState extends State<ReviewCard> {
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
                 ),
+
+
                 Container(
                   height: 40,
                   width: MediaQuery.of(context).size.width,
@@ -1385,6 +1412,11 @@ class _ReviewCardState extends State<ReviewCard> {
                       if(_formKey.currentState.validate()){
                         Firestore.instance.collection("events").document(event).updateData({
                           "reviews":FieldValue.arrayUnion([reviewController.text]),
+                        });
+                        Firestore.instance.collection("events").document(event).get().then((doc){
+                          Firestore.instance.collection("events").document(event).updateData({
+                            "rating":(doc.data['rating']+reviewedRating)/2,
+                          });
                         });
                         Navigator.pop(context);
                       }

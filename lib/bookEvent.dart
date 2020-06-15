@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:rooms/aeoui.dart';
+import 'package:rooms/socialApp.dart';
 
 List<Map<String,dynamic>> firebaseBooking=[];
 
@@ -64,43 +65,50 @@ class _BookEventState extends State<BookEvent> {
   }
   bool walletPay=false;
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    SafeArea(
-      child: Flushbar(
-        shouldIconPulse: true,
-        isDismissible: true,
-        flushbarPosition: FlushbarPosition.TOP,
-        titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
-        messageText: Text("Booking Confirmed with id ${response.paymentId}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
-        duration: Duration(seconds: 1),
-        icon: Icon(Icons.check,color: Colors.white,),
-        backgroundColor:  Colors.green,
-      )..show(context).then((value){
-        Firestore.instance.collection("bookings").add(
-            {
-              "eventName":widget.eventName,
-              "email":widget.userEmail,
-              "totalPrice":persons.length*widget.eventPrice,
-              "bookedAt":Timestamp.now(),
-              "ashramEmail":widget.ashramEmail,
-              "personDetails":firebaseBooking,
-            }
-        ).then((value){
-          Firestore.instance.collection("bookings").document(value.documentID).updateData({
-            "bookingId":value.documentID,
+    Firestore.instance.collection("users").document(widget.ashramEmail).get().then((document){
+      if(document.exists){
+        addSocialChat(loggedInEmail, widget.ashramEmail,document.data['ashram'],document.data['photoURL']);
+      }
+    }).then((value){
+      SafeArea(
+        child: Flushbar(
+          shouldIconPulse: true,
+          isDismissible: true,
+          flushbarPosition: FlushbarPosition.TOP,
+          titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+          messageText: Text("Booking Confirmed with id ${response.paymentId}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+          duration: Duration(seconds: 1),
+          icon: Icon(Icons.check,color: Colors.white,),
+          backgroundColor:  Colors.green,
+        )..show(context).then((value){
+          Firestore.instance.collection("bookings").add(
+              {
+                "eventName":widget.eventName,
+                "email":widget.userEmail,
+                "totalPrice":persons.length*widget.eventPrice,
+                "bookedAt":Timestamp.now(),
+                "ashramEmail":widget.ashramEmail,
+                "personDetails":firebaseBooking,
+              }
+          ).then((value){
+            Firestore.instance.collection("bookings").document(value.documentID).updateData({
+              "bookingId":value.documentID,
+            });
+            Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+              for (DocumentSnapshot ds in snapshot.documents){
+                ds.reference.delete();
+              }});
+            setState(() {
+              adding=false;
+            });
           });
-          Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
-            for (DocumentSnapshot ds in snapshot.documents){
-              ds.reference.delete();
-            }});
-          setState(() {
-            adding=false;
-          });
-        });
 
-        Navigator.pop(context);
+          Navigator.pop(context);
 
-      }),
-    );
+        }),
+      );
+    });
+
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -126,42 +134,48 @@ class _BookEventState extends State<BookEvent> {
 
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    SafeArea(
-      child: Flushbar(
-        flushbarPosition: FlushbarPosition.TOP,
-        shouldIconPulse: true,
-        isDismissible: true,
-        titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
-        messageText: Text("Payment Made using ${response.walletName}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
-        duration: Duration(seconds: 1),
-        icon: Icon(Icons.check,color: Colors.white,),
-        backgroundColor:  Colors.green,
-      )..show(context).then((value){
-        Firestore.instance.collection("bookings").add(
-            {
-              "eventName":widget.eventName,
-              "email":widget.userEmail,
-              "totalPrice":persons.length*widget.eventPrice,
-              "bookedAt":Timestamp.now(),
-              "ashramEmail":widget.ashramEmail,
-              "personDetails":firebaseBooking,
-            }
-        ).then((value){
+    Firestore.instance.collection("users").document(widget.ashramEmail).get().then((document){
+      if(document.exists){
+        addSocialChat(loggedInEmail, widget.ashramEmail,document.data['ashram'],document.data['photoURL']);
+      }
+    }).then((value){
+      SafeArea(
+        child: Flushbar(
+          flushbarPosition: FlushbarPosition.TOP,
+          shouldIconPulse: true,
+          isDismissible: true,
+          titleText: Text("Payment Successful",style: GoogleFonts.aBeeZee(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 17.0),),
+          messageText: Text("Payment Made using ${response.walletName}",style: GoogleFonts.aBeeZee(color: Colors.white,fontSize: 15.0)),
+          duration: Duration(seconds: 1),
+          icon: Icon(Icons.check,color: Colors.white,),
+          backgroundColor:  Colors.green,
+        )..show(context).then((value){
+          Firestore.instance.collection("bookings").add(
+              {
+                "eventName":widget.eventName,
+                "email":widget.userEmail,
+                "totalPrice":persons.length*widget.eventPrice,
+                "bookedAt":Timestamp.now(),
+                "ashramEmail":widget.ashramEmail,
+                "personDetails":firebaseBooking,
+              }
+          ).then((value){
 
-          Firestore.instance.collection("bookings").document(value.documentID).updateData({
-            "bookingId":value.documentID,
+            Firestore.instance.collection("bookings").document(value.documentID).updateData({
+              "bookingId":value.documentID,
+            });
+            Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
+              for (DocumentSnapshot ds in snapshot.documents){
+                ds.reference.delete();
+              }});
+            setState(() {
+              adding=false;
+            });
           });
-          Firestore.instance.collection("bookings").document(loggedInEmail).collection('${widget.userEmail}_${widget.eventName}_persons').getDocuments().then((snapshot) {
-            for (DocumentSnapshot ds in snapshot.documents){
-              ds.reference.delete();
-            }});
-          setState(() {
-            adding=false;
-          });
-        });
-        Navigator.pop(context);
-      }),
-    );
+          Navigator.pop(context);
+        }),
+      );
+    });
   }
 
   @override
@@ -370,12 +384,12 @@ class _BookEventState extends State<BookEvent> {
                           Firestore.instance.collection("users").document(widget.userEmail).updateData({
                             "walletBalance":doc.data['walletBalance']-widget.eventPrice*persons.length,
                           }).then((value) {
-                            Firestore.instance.collection("users").document("oshoyatra2002@gmail.com")
+                            Firestore.instance.collection("users").document(widget.ashramEmail)
                                 .get()
                                 .then((document) {
                               if (document.exists) {
                                 Firestore.instance.collection("users").document(
-                                    "oshoyatra2002@gmail.com").updateData({
+                                    widget.ashramEmail).updateData({
                                   "walletBalance": document.data['walletBalance'] +
                                       widget.eventPrice * persons.length,
                                 }).then((v) {
@@ -389,6 +403,7 @@ class _BookEventState extends State<BookEvent> {
                                         "personDetails":firebaseBooking,
                                       }
                                   ).then((value){
+                                    addSocialChat(loggedInEmail, widget.ashramEmail,document.data['ashram'],document.data['photoURL']);
                                     Flushbar(
                                       flushbarPosition: FlushbarPosition.TOP,
                                       shouldIconPulse: true,
@@ -404,24 +419,26 @@ class _BookEventState extends State<BookEvent> {
                                         "fromName":doc.data['name'],
                                         "toName":"Osho Ashrams",
                                         "fromEmail":doc.data['email'],
-                                        "toEmail":"oshoyatra2002@gmail.com",
+                                        "toEmail":widget.ashramEmail,
                                         "time":DateTime.now().toIso8601String(),
                                       }).then((value) {
+
                                         Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").document(value.documentID).updateData(
                                             {
                                               "transactionId": value.documentID,
                                             });
-                                        Firestore.instance.collection("walletTransactions").document("oshoyatra2002@gmail.com").collection("transactions").document(value.documentID).setData({
+                                        Firestore.instance.collection("walletTransactions").document(widget.ashramEmail).collection("transactions").document(value.documentID).setData({
                                           "amount":widget.eventPrice*persons.length,
                                           "fromName":doc.data['name'],
                                           "toName":"Osho Ashrams",
                                           "fromEmail":doc.data['email'],
-                                          "toEmail":"oshoyatra2002@gmail.com",
+                                          "toEmail":widget.ashramEmail,
                                           "time":DateTime.now().toIso8601String(),
                                           "transactionId": value.documentID,
                                         });
                                       }
                                       );
+
                                       Navigator.pop(context);
                                     });
 

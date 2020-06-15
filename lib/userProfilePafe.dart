@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rooms/MyRide.dart';
 import 'package:rooms/hisroryAndWallet.dart';
 import 'package:rooms/profileImg.dart';
+import 'package:rooms/socialApp.dart';
 import 'package:rooms/widgets/customshape.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'aeoui.dart';
@@ -207,9 +208,152 @@ int retGender(AsyncSnapshot snapshot){
                           ),
                           )),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: FlatButton.icon(
+                                  color: Color.fromRGBO(253, 11, 23, 1),
+                                  onPressed: () {
+                                    if(snapshot.data['name']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Provide name to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['email']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Update email to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['age']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Set age to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['gender']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Select gender to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['photoURL']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Update profile image to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else{
+                                      Navigator.of(context).push(new MaterialPageRoute(
+                                          builder: (BuildContext context) => MyRide(userName:snapshot.data['name'],userEmail: snapshot.data['email'],age: snapshot.data['age'],gender: snapshot.data['gender'],img: snapshot.data['photoURL'],)));
+                                    }
+                                    },
+                                  icon: Icon(
+                                    Icons.directions_car,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    "My Rides",
+                                    style: GoogleFonts.balooBhaina(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          color: Color.fromRGBO(253, 11, 23, 1),
+                                          width: 3,
+                                          style: BorderStyle.solid),
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: FlatButton.icon(
+                                  color: Color.fromRGBO(253, 11, 23, 1),
+                                  onPressed: () {
+                                    if(snapshot.data['name']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Provide name to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['email']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Update email to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['age']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Set age to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['gender']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Select gender to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else if(snapshot.data['photoURL']==null){
+                                      Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Icon(Icons.error),
+                                        ),Text("Update profile image to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
+                                      ],),));
+                                    }
+                                    else{
+                                      Navigator.of(context).push(new MaterialPageRoute(
+                                          builder: (BuildContext context) => Social(userName:snapshot.data['name'],userEmail: snapshot.data['email'],age: snapshot.data['age'],gender: snapshot.data['gender'],img: snapshot.data['photoURL'],)));
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    "Friends",
+                                    style: GoogleFonts.balooBhaina(
+                                      color: Colors.white,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          color: Color.fromRGBO(253, 11, 23, 1),
+                                          width: 3,
+                                          style: BorderStyle.solid),
+                                      borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                            ],
+                          ),
                           FlatButton.icon(
                             color: Color.fromRGBO(253, 11, 23, 1),
                             onPressed: () {
@@ -222,75 +366,6 @@ int retGender(AsyncSnapshot snapshot){
                             ),
                             label: Text(
                               "Wallet",
-                              style: GoogleFonts.balooBhaina(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: Color.fromRGBO(253, 11, 23, 1),
-                                    width: 3,
-                                    style: BorderStyle.solid),
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-//                SizedBox(
-//                  width: 10.0,
-//                ),
-                          FlatButton.icon(
-                            color: Color.fromRGBO(253, 11, 23, 1),
-                            onPressed: () {
-                              if(snapshot.data['name']==null){
-                                Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Icon(Icons.error),
-                                  ),Text("Provide name to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
-                                ],),));
-                              }
-                              else if(snapshot.data['email']==null){
-                                Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Icon(Icons.error),
-                                  ),Text("Update email to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
-                                ],),));
-                              }
-                              else if(snapshot.data['age']==null){
-                                Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Icon(Icons.error),
-                                  ),Text("Set age to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
-                                ],),));
-                              }
-                              else if(snapshot.data['gender']==null){
-                                Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Icon(Icons.error),
-                                  ),Text("Select gender to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
-                                ],),));
-                              }
-                              else if(snapshot.data['photoURL']==null){
-                                Scaffold.of(context).showSnackBar(SnackBar(backgroundColor: deepRed,content: Row(children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Icon(Icons.error),
-                                  ),Text("Update profile image to proceed",style: GoogleFonts.aBeeZee(fontSize: 14.0,fontWeight:FontWeight.w700),)
-                                ],),));
-                              }
-                              else{
-                                Navigator.of(context).push(new MaterialPageRoute(
-                                    builder: (BuildContext context) => MyRide(userName:snapshot.data['name'],userEmail: snapshot.data['email'],age: snapshot.data['age'],gender: snapshot.data['gender'],img: snapshot.data['photoURL'],)));
-                              }
-                              },
-                            icon: Icon(
-                              Icons.directions_car,
-                              color: Colors.white,
-                            ),
-                            label: Text(
-                              "My Rides",
                               style: GoogleFonts.balooBhaina(
                                 color: Colors.white,
                                 fontSize: 14.0,

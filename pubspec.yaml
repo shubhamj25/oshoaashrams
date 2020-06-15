@@ -52,6 +52,7 @@ dependencies:
   progress_indicators: ^0.1.5
   toggle_switch:
   firebase_storage:
+  smooth_star_rating: 1.1.1
   http:
   flutter:
     sdk: flutter

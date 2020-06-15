@@ -954,18 +954,22 @@ class _ChatCardState extends State<ChatCard> {
       });
     }
   }
+  String message;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal:8.0),
       child: Card(
         elevation: 10.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
         child: ListTile(
           leading:Material(
             shape: CircleBorder(),
             child: Container(
-              width: 60.0,
-              height: 60.0,
+              width: 50.0,
+              height: 50.0,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color:deepRed,width: 3.0),
@@ -985,12 +989,12 @@ class _ChatCardState extends State<ChatCard> {
                   padding: const EdgeInsets.all(32.0),
                   child: CircularProgressIndicator(),
                 ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+                errorWidget: (context, url, error) => Icon(Icons.account_circle,color: Colors.blueAccent,size: 50,),
               ),
             ),
           ),
-          title: Text(widget.chatToName,style: GoogleFonts.aBeeZee(fontSize: 18.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
-          subtitle: Text("Osho Customer",style: GoogleFonts.aBeeZee(fontSize: 16.0,fontWeight: FontWeight.w500)),
+          title: Text(widget.chatToName,style: GoogleFonts.aBeeZee(fontSize: 17.0,color:Colors.cyan,fontWeight: FontWeight.w600),),
+          subtitle: Text("Osho Customer",style: GoogleFonts.aBeeZee(fontSize: 15.0,fontWeight: FontWeight.w500)),
           trailing: Container(
             width: MediaQuery.of(context).size.width*0.2,
             child: Row(
@@ -1015,7 +1019,7 @@ class _ChatCardState extends State<ChatCard> {
                         padding: const EdgeInsets.all(6.0),
                         child: Text("$unseen",style: GoogleFonts.aBeeZee(fontSize: 14,color: Colors.white),),
                       ),
-                    ):travelMode;
+                    ):travelMode??Icon(Icons.notifications);
                   }
                 ),
                 IconButton(icon: Icon(Icons.delete,color: deepRed,),
@@ -1089,19 +1093,24 @@ class _ChatCardState extends State<ChatCard> {
                         ),
                         Material(
                           elevation: 20.0,
+                          color:Colors.white,
                           child: TextFormField(
                             controller: _messageController,
                             style: GoogleFonts.aBeeZee(fontSize: MediaQuery.of(context).size.width*0.05,color:Colors.black,fontWeight: FontWeight.w500),
                             decoration: InputDecoration(
-                              labelStyle:GoogleFonts.aBeeZee(fontSize: MediaQuery.of(context).size.width*0.045),
+                              labelStyle:GoogleFonts.balooBhaina(fontSize: 16),
                               labelText: "Type a message",
                               contentPadding: EdgeInsets.symmetric(horizontal: 18.0,vertical: 5.0),
                               suffixIcon: IconButton(
                                 icon: Icon(Icons.send,size:25.0,color: Colors.black,),
                                 onPressed: (){
+                                  setState(() {
+                                    message=_messageController.text;
+                                  });
+                                  _messageController.clear();
                                   Firestore.instance
                                       .collection("chats").document(loggedInEmail).collection("chats_$loggedInEmail").document("chat_${loggedInEmail}with${widget.chatToEmail}").collection("chat").add({
-                                    "message":_messageController.text,
+                                    "message":message,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
                                     "seen":false,
@@ -1115,26 +1124,25 @@ class _ChatCardState extends State<ChatCard> {
                                   });
                                   Firestore.instance
                                       .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").add({
-                                    "message":_messageController.text,
+                                    "message":message,
                                     "accountEmail":loggedInEmail,
                                     'timestamp': DateTime.now().toIso8601String(),
                                   }).then((value){
-                                    Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").add({
-                                      "message":"Message from \n${widget.userEmail}\n\"${_messageController.text}\"",
-                                      "timestamp":DateTime.now().toIso8601String(),
-                                      "seen":false
+                                    Firestore.instance
+                                        .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                      "id":value.documentID,
+                                      "seen":false,
                                     }).then((value){
-                                      Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").document(value.documentID).updateData({
-                                        "id":value.documentID,
-                                      });
-                                      setState(() {
-                                        Firestore.instance
-                                            .collection("chats").document(widget.chatToEmail).collection("chats_${widget.chatToEmail}").document("chat_${widget.chatToEmail}with$loggedInEmail").collection("chat").document(value.documentID).updateData({
+                                      Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").add({
+                                        "message":"Message from \n${widget.userEmail}\n\"$message,\"",
+                                        "timestamp":DateTime.now().toIso8601String(),
+                                        "seen":false
+                                      }).then((value){
+                                        Firestore.instance.collection("notifications").document(widget.chatToEmail).collection("notifications_${widget.chatToEmail}").document(value.documentID).updateData({
                                           "id":value.documentID,
-                                          "seen":false,
                                         });
-                                        _messageController.clear();
                                       });
+
                                     });
 
                                   });
