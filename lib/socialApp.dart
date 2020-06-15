@@ -102,7 +102,8 @@ class _SocialState extends State<Social> {
                                   allUsers.clear();
                                   if(snapshot.hasData){
                                     for(int i=0;i<snapshot.data.documents.length;i++){
-                                      if(snapshot.data.documents.elementAt(i).data['name'].toString().contains(friendName)||snapshot.data.documents.elementAt(i).data['name'].toString().toUpperCase().contains(friendName)||snapshot.data.documents.elementAt(i).data['name'].toString().toLowerCase().contains(friendName)
+                                      if((snapshot.data.documents.elementAt(i).data['name'].toString().contains(friendName)||snapshot.data.documents.elementAt(i).data['name'].toString().toUpperCase().contains(friendName)||snapshot.data.documents.elementAt(i).data['name'].toString().toLowerCase().contains(friendName))
+                                      && snapshot.data.documents.elementAt(i).data['email']!=loggedInEmail
                                       ){
                                         allUsers.add(UserCard(
                                             snapshot.data.documents.elementAt(i).data['photoURL'],
@@ -157,7 +158,6 @@ class _SocialState extends State<Social> {
                                         snapshot.data.documents.elementAt(i).data['email'],
                                         snapshot.data.documents.elementAt(i).data['name'],
                                       ));
-
                                     }
                                   }
                                   return !snapshot.hasData?Center(
