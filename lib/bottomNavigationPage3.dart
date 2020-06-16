@@ -129,10 +129,10 @@ class _SavedEventCardState extends State<SavedEventCard> {
                           image: imageProvider, fit: BoxFit.cover),
                     ),
                   ),
-                  placeholder: (context, url) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical:32.0),
-                    child: Center(child: Container(width:25,height: 25,child: CircularProgressIndicator(strokeWidth: 2,backgroundColor: Colors.white,))),
-                  ),
+                  placeholder: (context, url) => Container(decoration:BoxDecoration(
+                    color: Colors.lightBlue,
+                    borderRadius: BorderRadius.only(topRight:Radius.circular(12.0),topLeft:Radius.circular(12.0)),
+                  ) ,height:175,),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
                 SizedBox(

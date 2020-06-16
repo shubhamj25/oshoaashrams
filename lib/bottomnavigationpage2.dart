@@ -44,6 +44,7 @@ class _BookingPageState extends State<BookingPage> {
                     ],
                   ),
 
+
                   FloatingActionButton(
                     heroTag: 1,
                     backgroundColor: Colors.redAccent,
@@ -57,6 +58,50 @@ class _BookingPageState extends State<BookingPage> {
                 ],),
             ),
 
+           Padding(
+             padding: const EdgeInsets.all(8.0),
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: <Widget>[
+                 Padding(
+                   padding: const EdgeInsets.all(2.5),
+                   child: Row(
+                     children: <Widget>[
+                       Padding(
+                         padding: const EdgeInsets.symmetric(horizontal:8.0),
+                         child: Icon(Icons.hourglass_full,color:Colors.blue),
+                       ),
+                       Text("Waiting for Approval",style: GoogleFonts.aBeeZee(fontSize: 18),),
+                     ],
+                   ),
+                 ),
+                 Padding(
+                   padding: const EdgeInsets.all(2.5),
+                   child: Row(
+                     children: <Widget>[
+                       Padding(
+                         padding: const EdgeInsets.symmetric(horizontal:8.0),
+                         child: Icon(Icons.check_circle,color:Colors.green),
+                       ),
+                       Text("Accepted",style: GoogleFonts.aBeeZee(fontSize: 18),),
+                     ],
+                   ),
+                 ),
+                 Padding(
+                   padding: const EdgeInsets.all(2.5),
+                   child: Row(
+                     children: <Widget>[
+                       Padding(
+                         padding: const EdgeInsets.symmetric(horizontal:8.0),
+                         child: Icon(Icons.cancel,color:deepRed),
+                       ),
+                       Text("Rejected",style: GoogleFonts.aBeeZee(fontSize: 18),),
+                     ],
+                   ),
+                 )
+               ],
+             ),
+           ),
             StreamBuilder<QuerySnapshot>(
               stream: Firestore.instance.collection("bookings").orderBy('bookedAt',descending: true).snapshots(),
               builder: (context,snapshot){
@@ -69,6 +114,7 @@ class _BookingPageState extends State<BookingPage> {
                         snapshot.data.documents.elementAt(i).data['totalPrice'],
                         List.from(snapshot.data.documents.elementAt(i).data['personDetails']),
                         snapshot.data.documents.elementAt(i).data['bookedAt'],
+                        snapshot.data.documents.elementAt(i).data['status'],
                        ));
                   }
                 bookings.sort((a,b){ return b.placedOn.compareTo(a.placedOn);});
@@ -91,11 +137,11 @@ class _BookingPageState extends State<BookingPage> {
 }
 
 class BookingCard extends StatefulWidget {
-  final String bookingId,eventName,userEmail;
+  final String bookingId,eventName,userEmail,status;
   final int total;
   final Timestamp placedOn;
   final List<Map<String, dynamic>> persons;
-  BookingCard(this.bookingId,this.userEmail,this.eventName,this.total,this.persons,this.placedOn);
+  BookingCard(this.bookingId,this.userEmail,this.eventName,this.total,this.persons,this.placedOn, this.status);
   @override
   _BookingCardState createState() => _BookingCardState();
 }
@@ -118,7 +164,7 @@ class _BookingCardState extends State<BookingCard> {
         defaultTrailingIconColor: Colors.white,
         initiallyExpanded: false,
         boxDecoration: BoxDecoration(
-            color: deepRed,
+            color: widget.status=="Accepted"?Colors.green:widget.status=="Rejected"?deepRed:Colors.blueAccent,
             borderRadius: BorderRadius.only(topRight: Radius.circular(16.0),bottomLeft: Radius.circular(16.0)),
             boxShadow: [
               BoxShadow(
@@ -239,6 +285,40 @@ class _BookingCardState extends State<BookingCard> {
               children:peeps,
             ),
           ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width*0.911,
+              height: 40,
+              decoration: BoxDecoration(
+                color: widget.status=="Accepted"?Colors.green:widget.status=="Rejected"?deepRed:Colors.blueAccent,
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    widget.status=="Accepted"?Padding(
+                      padding: const EdgeInsets.symmetric(horizontal:5.0),
+                      child: Icon(Icons.check_circle,color: Colors.white,),
+                    ):widget.status=="Rejected"?Padding(
+                      padding: const EdgeInsets.symmetric(horizontal:5.0),
+                      child: Icon(Icons.cancel,color: Colors.white,),
+                    ):Padding(
+                      padding: const EdgeInsets.symmetric(horizontal:5.0),
+                      child: Icon(Icons.hourglass_full,color: Colors.white,),
+                    ),
+                    Text(widget.status=="Accepted"?"Accepted":widget.status=="Rejected"?"Rejected":"Waiting for Approval"
+                    ,style:GoogleFonts.balooBhaina(fontSize: 18,color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+
         ],
         subtitle: Padding(
           padding: const EdgeInsets.symmetric(horizontal:8.0,vertical: 4),
