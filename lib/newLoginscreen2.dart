@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -91,6 +90,8 @@ var prefs;
       "email":email,
       "gender":gender,
       "password":password,
+      "activated":false,
+      "organizer":false,
       "walletBalance":0,
     });
   }
@@ -223,6 +224,8 @@ var prefs;
               "photoURL":profileData['picture'],
               "password":"oshoaashrams",
               "walletBalance":0,
+              "activated":false,
+              "organizer":false,
             },merge: true);
             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
               return AeoUI(username: profileData['email'],rememberMe:_rememberMe);
@@ -668,7 +671,9 @@ void updateUserData(FirebaseUser user) async {
         'name': user.displayName,
         'lastSeen': DateTime.now(),
         "password":"oshoaashrams",
-        "walletBalance":0
+        "walletBalance":0,
+        "activated":false,
+        "organizer":false,
       }, merge: true);
     }
     else

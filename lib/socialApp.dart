@@ -764,19 +764,17 @@ class _ChatCardState extends State<ChatCard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Firestore.instance.collection("users").document(widget.chatToEmail).get().then((doc){
-      if(doc.exists){
-        if(doc.data['ashram']!=null){
-          setState(() {
-            organizer=true;
-          });
-        }
+    Firestore.instance.collection("ashrams").document(widget.chatToEmail).get().then((doc){
+      if(doc.exists) {
+        setState(() {
+          organizer = true;
+        });
+      }
         else{
           setState(() {
             organizer=false;
           });
         }
-      }
     });
   }
   @override
@@ -843,7 +841,7 @@ class _ChatCardState extends State<ChatCard> {
                           padding: const EdgeInsets.all(5.0),
                           child: Text("$unseen",style: GoogleFonts.aBeeZee(fontSize: 14,color: Colors.white),),
                         ),
-                      ):Icon(Icons.notifications);
+                      ):Icon(organizer?Icons.live_help:Icons.notifications);
                     }
                 ),
                 IconButton(icon: Icon(Icons.delete,color: deepRed,),

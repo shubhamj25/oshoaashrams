@@ -373,8 +373,8 @@ class _RideCardState extends State<RideCard> {
                   child: Material(
                     shape: CircleBorder(),
                     child: Container(
-                      width: MediaQuery.of(context).size.width*0.32,
-                      height: MediaQuery.of(context).size.width*0.32,
+                      width: MediaQuery.of(context).size.width*0.25,
+                      height: MediaQuery.of(context).size.width*0.25,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white,width: 3.0),
