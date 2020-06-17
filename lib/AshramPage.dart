@@ -208,13 +208,18 @@ class _AshramPageState extends State<AshramPage> {
         }
       });
     });
-    Firestore.instance.collection("ashrams").document(loggedInEmail).get().then((doc){
+    Firestore.instance.collection("ashrams").document(widget.email).get().then((doc){
       setState(() {
         if(doc.exists){
-          ownAshram=true;
-        }
-        else{
-          ownAshram=false;
+          if(doc.data['email']==loggedInEmail){
+            setState(() {
+              ownAshram=true;
+            });
+          }else{
+            setState(() {
+              ownAshram=false;
+            });
+          }
         }
       });
     });
