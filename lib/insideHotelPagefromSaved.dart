@@ -2,8 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rooms/bookEvent.dart';
+import 'package:rooms/widgets/custom_icons_icons.dart';
 import 'aeoui.dart';
-import 'bookEvent.dart';
 
 class HotelDetailsPagefromSaved extends StatefulWidget {
   final String eventName;
@@ -28,14 +29,16 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
               starRating.clear();
               if(snapshot.hasData){
                 Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title'].toString()).get().then((doc){
-                  setState(() {
                     if(doc.exists){
-                      favourite=true;
+                      setState(() {
+                        favourite=true;
+                      });
                     }
                     else{
-                      favourite=false;
+                      setState(() {
+                        favourite=false;
+                      });
                     }
-                  });
                 });
                 double rating=snapshot.data['rating'];
                 int actualRating=rating.round();
@@ -81,7 +84,48 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        const SizedBox(height: 180),
+                        const SizedBox(height: 100),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal:10.0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width*0.5,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                              ),
+                              elevation: 12.0,
+                              child:  Stack(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.favorite,color: deepRed,),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text("Interested",style: GoogleFonts.balooBhai(fontSize:18),),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  StreamBuilder(
+                                      stream: Firestore.instance.collection("events").document(snapshot.data['title']).snapshots(),
+                                      builder: (context, snap) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top:30.0,left:55.0),
+                                          child: AnimatedCount(count: !snap.hasData?0:snap.data['interested'], duration:  Duration(seconds: 4)),
+                                        );
+                                      }
+                                  )
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Text(
@@ -121,7 +165,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                           ],
                         ),
                         Container(
-                          padding: const EdgeInsets.all(32.0),
+                          padding: const EdgeInsets.all(20.0),
                           color: Colors.white,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +238,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                       Firestore.instance.collection("users").document(loggedInEmail).get().then((doc){
                                         if((doc.data['name']!=null&&doc.data['name']!="")&&(doc.data['email']!=null&&doc.data['email']!="")&&(doc.data['gender']!=null&&doc.data['gender']!="")&&(doc.data['age']!=null&&doc.data['age']!="")){
                                           Navigator.push(context, MaterialPageRoute(builder: (context){
-                                            return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],ashramEmail: snapshot.data['email'],);
+                                            return BookEvent(eventName: snapshot.data['title'],userEmail: loggedInEmail,eventPrice: snapshot.data['price'],ashramEmail: snapshot.data['email'],ashramName: snapshot.data['ashram'],);
                                           }));
                                         }
                                         else{
@@ -231,7 +275,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                     color: Color.fromRGBO(253, 11, 23, 1),
                                     textColor: Colors.white,
                                     child: Text(
-                                      !favourite?"Add to Saved":"Remove Saved",
+                                      !favourite?"Interested":"Remove Saved",
                                       style: TextStyle(fontWeight: FontWeight.normal),
                                     ),
                                     padding: const EdgeInsets.symmetric(
@@ -249,8 +293,18 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                         "ashram":snapshot.data['ashram'],
                                         "start":snapshot.data['start'],
                                         "end":snapshot.data['end'],
-                                      }):
-                                      Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete();
+                                      }).then((value){
+                                        Firestore.instance.collection("events").document(snapshot.data['title'].toString()).updateData({
+                                          "interested":snapshot.data['interested']+1,
+                                        });
+                                      })
+
+                                          :
+                                      Firestore.instance.collection("savedEvents").document(loggedInEmail).collection("saved").document(snapshot.data['title']).delete().then((value){
+                                        Firestore.instance.collection("events").document(snapshot.data['title'].toString()).updateData({
+                                          "interested":snapshot.data['interested']-1,
+                                        });
+                                      });
                                       !favourite?_scaffoldKey.currentState.showSnackBar(SnackBar(
                                           content: Row(
                                             children: <Widget>[
@@ -290,6 +344,7 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                   ),
                                 ],
                               ),
+                              SizedBox(height: 12.0,),
                               const SizedBox(height: 30.0),
                               Text(
                                 "Description",
@@ -303,6 +358,121 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
                                     fontWeight: FontWeight.w200,fontFamily: 'Raleway', fontSize: 18.0),
                               ),
                               const SizedBox(height: 10.0),
+                              Container(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:5.0,vertical: 8),
+                                      child: Icon(Icons.event_available,color:Colors.green,size: 30,),
+                                    ),
+                                    Text(
+                                      "Start\n${snapshot.data['start']}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w200,fontFamily: 'Raleway', fontSize: 16.0),
+                                    ),
+                                  ],
+                                ),
+
+                              ),
+                              Container(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal:5.0,vertical: 8),
+                                      child: Icon(Icons.event_busy,color:deepRed,size: 30,),
+                                    ),
+                                    Text(
+                                      "End\n${snapshot.data['end']}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w200,fontFamily: 'Raleway', fontSize: 16.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(CustomIcons.place_of_worship,color:deepRed,size: 20,),
+                                  ),
+                                  Text("${snapshot.data['ashram']}",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w200,fontFamily: 'Raleway', fontSize: 18.0),
+                                  ),
+                                ],
+                              ),
+
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(Icons.location_on,color: Colors.blueAccent,),
+                                  ),
+                                  Text("${snapshot.data['location']}",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w200,fontFamily: 'Raleway', fontSize: 18.0),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20,),
+                              Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                                ),
+                                elevation: 8,
+                                child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal:16,vertical:8.0),
+                                          child: Text("Reviews (${List.from(snapshot.data['reviews']).length-1})",style: GoogleFonts.balooBhaina(fontSize:18,color:Colors.black54),),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal:16,vertical:8.0),
+                                          child: Icon(Icons.rate_review,color: Colors.blueAccent,size: 30,),
+                                        ),
+                                      ],
+                                    ),
+                                    List.from(snapshot.data['reviews']).length!=1?Scrollbar(
+                                      isAlwaysShown: true,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal:20,vertical: 10),
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight:300,
+                                          ),
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.vertical,
+                                            itemCount: List.from(snapshot.data['reviews']).length,
+                                            itemBuilder: (context,index){
+                                              return List.from(snapshot.data['reviews']).reversed.elementAt(index).toString()!=""?
+                                              ListTile(
+                                                contentPadding: const EdgeInsets.all(0),
+                                                trailing:Icon(Icons.account_circle,color: Colors.blueGrey,),
+                                                title:Text("${List.from(snapshot.data['reviews']).reversed.elementAt(index).toString()}",
+                                                  style: GoogleFonts.aBeeZee(fontSize:16),
+                                                ),
+                                              ):Container();
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ):Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Text("No reviews yet",style: GoogleFonts.balooBhai(fontSize: 16,color: Colors.grey),),
+                                    )
+                                  ],
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -330,5 +500,36 @@ class _HotelDetailsPagefromSavedState extends State<HotelDetailsPagefromSaved> {
         ),
       ),
     );
+  }
+}
+
+class AnimatedCount extends ImplicitlyAnimatedWidget {
+  final int count;
+
+  AnimatedCount({
+    Key key,
+    @required this.count,
+    @required Duration duration,
+    Curve curve = Curves.linear
+  }) : super(duration: duration, curve: curve, key: key);
+
+  @override
+  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() => _AnimatedCountState();
+}
+
+class _AnimatedCountState extends AnimatedWidgetBaseState<AnimatedCount> {
+  IntTween _count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: new Text(_count.evaluate(animation).toString(),style:GoogleFonts.aBeeZee(fontSize: 16),textAlign: TextAlign.center,),
+    );
+  }
+
+  @override
+  void forEachTween(TweenVisitor visitor) {
+    _count = visitor(_count, widget.count, (dynamic value) => new IntTween(begin: value));
   }
 }

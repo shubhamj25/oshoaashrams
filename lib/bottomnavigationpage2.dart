@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:groovin_widgets/groovin_expansion_tile.dart';
 import 'package:rooms/aeoui.dart';
+import 'package:rooms/insideHotelPage.dart';
+import 'package:rooms/widgets/custom_icons_icons.dart';
 import 'organiserPageNotifications.dart';
 
 
@@ -115,6 +117,7 @@ class _BookingPageState extends State<BookingPage> {
                         List.from(snapshot.data.documents.elementAt(i).data['personDetails']),
                         snapshot.data.documents.elementAt(i).data['bookedAt'],
                         snapshot.data.documents.elementAt(i).data['status'],
+                      snapshot.data.documents.elementAt(i).data['ashram'],
                        ));
                   }
                 bookings.sort((a,b){ return b.placedOn.compareTo(a.placedOn);});
@@ -137,11 +140,11 @@ class _BookingPageState extends State<BookingPage> {
 }
 
 class BookingCard extends StatefulWidget {
-  final String bookingId,eventName,userEmail,status;
+  final String bookingId,eventName,userEmail,status,ashramName;
   final int total;
   final Timestamp placedOn;
   final List<Map<String, dynamic>> persons;
-  BookingCard(this.bookingId,this.userEmail,this.eventName,this.total,this.persons,this.placedOn, this.status);
+  BookingCard(this.bookingId,this.userEmail,this.eventName,this.total,this.persons,this.placedOn, this.status, this.ashramName);
   @override
   _BookingCardState createState() => _BookingCardState();
 }
@@ -233,6 +236,31 @@ class _BookingCardState extends State<BookingCard> {
                         Expanded(child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text("${widget.eventName}", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.045)),
+                        )),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 1.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(child: Text("Location", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w800,
+                            fontSize: MediaQuery
+                                .of(context)
+                                .size
+                                .width * 0.045))),
+                        Expanded(child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("${widget.ashramName}", style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w600,
                               fontSize: MediaQuery
@@ -340,7 +368,24 @@ class _BookingCardState extends State<BookingCard> {
                     .of(context)
                     .size
                     .width * 0.048,color:Colors.white,fontWeight: FontWeight.w600),),
-
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context){
+                      return HotelDetailsPage(eventName: widget.eventName,);
+                    }
+                  ));
+                },
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Icon(Icons.info,color:Colors.white),
+                    ),
+                    Text("View Event Details",style: GoogleFonts.balooBhai(fontSize:16,color: Colors.white),)
+                  ],
+                ),
+              )
 
             ],
           ),

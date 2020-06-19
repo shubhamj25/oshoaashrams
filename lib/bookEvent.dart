@@ -12,9 +12,9 @@ List<Map<String,dynamic>> firebaseBooking=[];
 
 List<PersonCard> persons=[];
 class BookEvent extends StatefulWidget {
-  final String eventName,userEmail,ashramEmail;
+  final String eventName,userEmail,ashramEmail,ashramName;
   final int eventPrice;
-  BookEvent({this.eventName, this.userEmail,this.eventPrice, this.ashramEmail});
+  BookEvent({this.eventName, this.userEmail,this.eventPrice, this.ashramEmail, this.ashramName});
   @override
   _BookEventState createState() => _BookEventState();
 }
@@ -87,6 +87,7 @@ class _BookEventState extends State<BookEvent> {
                 "email":widget.userEmail,
                 "totalPrice":persons.length*widget.eventPrice,
                 "bookedAt":Timestamp.now(),
+                "ashram":widget.ashramName,
                 "ashramEmail":widget.ashramEmail,
                 "personDetails":firebaseBooking,
               }
@@ -156,6 +157,7 @@ class _BookEventState extends State<BookEvent> {
                 "email":widget.userEmail,
                 "totalPrice":persons.length*widget.eventPrice,
                 "bookedAt":Timestamp.now(),
+                "ashram":widget.ashramName,
                 "ashramEmail":widget.ashramEmail,
                 "personDetails":firebaseBooking,
               }
@@ -220,36 +222,51 @@ class _BookEventState extends State<BookEvent> {
 
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: <Widget>[
-                          ListTile(
-                            title: Text(
-                              "Event Location",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(color: Colors.red,fontSize: 21.0,fontWeight: FontWeight.w600),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              title: Text(
+                                "Event Name",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(color: Colors.red,fontSize: 21.0,fontWeight: FontWeight.w600),
+                              ),
+                              subtitle: Text(
+                                widget.eventName,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontSize: 21.0,fontWeight: FontWeight.w500),
+                              ),
                             ),
-                            subtitle: Text(
-                              widget.eventName,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 21.0,fontWeight: FontWeight.w500),
-                            ),
-                          ),
 
-                          ListTile(
-                            title: Text(
-                              "Price",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(color: Colors.red,fontSize: 21.0,fontWeight: FontWeight.w600),
+                            ListTile(
+                              title: Text(
+                                "Event Location",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(color: Colors.red,fontSize: 21.0,fontWeight: FontWeight.w600),
+                              ),
+                              subtitle: Text(
+                                widget.ashramName,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontSize: 21.0,fontWeight: FontWeight.w500),
+                              ),
                             ),
-                            subtitle: Text(
-                              "₹ ${widget.eventPrice} /per person per night",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 21.0,fontWeight: FontWeight.w500),
-                            ),
-                          ),
 
-                        ],
+
+                            ListTile(
+                              title: Text(
+                                "Price",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(color: Colors.red,fontSize: 21.0,fontWeight: FontWeight.w600),
+                              ),
+                              subtitle: Text(
+                                "₹ ${widget.eventPrice} /per person per night",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontSize: 21.0,fontWeight: FontWeight.w500),
+                              ),
+                            ),
+
+                          ],
+                        ),
                       ),
                     ),
                     FadingText('Long Press to Pay',style: GoogleFonts.aBeeZee(fontSize: 16.0),),
@@ -400,6 +417,7 @@ class _BookEventState extends State<BookEvent> {
                                         "totalPrice":persons.length*widget.eventPrice,
                                         "bookedAt":Timestamp.now(),
                                         "ashramEmail":widget.ashramEmail,
+                                        "ashram":widget.ashramName,
                                         "personDetails":firebaseBooking,
                                       }
                                   ).then((value){
@@ -417,7 +435,7 @@ class _BookEventState extends State<BookEvent> {
                                       Firestore.instance.collection("walletTransactions").document(loggedInEmail).collection("transactions").add({
                                         "amount":widget.eventPrice*persons.length,
                                         "fromName":doc.data['name'],
-                                        "toName":"Osho Ashrams",
+                                        "toName":widget.ashramName,
                                         "fromEmail":doc.data['email'],
                                         "toEmail":widget.ashramEmail,
                                         "time":DateTime.now().toIso8601String(),
@@ -430,7 +448,7 @@ class _BookEventState extends State<BookEvent> {
                                         Firestore.instance.collection("walletTransactions").document(widget.ashramEmail).collection("transactions").document(value.documentID).setData({
                                           "amount":widget.eventPrice*persons.length,
                                           "fromName":doc.data['name'],
-                                          "toName":"Osho Ashrams",
+                                          "toName":widget.ashramName,
                                           "fromEmail":doc.data['email'],
                                           "toEmail":widget.ashramEmail,
                                           "time":DateTime.now().toIso8601String(),
